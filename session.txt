@@ -1,0 +1,195 @@
+class Session(object):
+    """ Session 抽象基类
+
+    已知 bug
+    --------
+
+    在保存到 Redis 或 其他存储中时下面这种形式无法设置成功:
+
+        session["a"] = {}
+        session["a"]["b"] = 1
+    """
+
+    _SESSION_COOKIE_KEY = "__SESSION__"
+
+    def __init__(
+            self, session_id, type_=None, expire_seconds=3600, *args, **kwargs
+    ):
+        self.__dict__['_sid'] = session_id
+        self.__dict__["_type"] = type_ or ""
+        self.__dict__["_clear_hooks"] = kwargs.pop("clear_hooks", None) or []
+        self.__dict__['_modified'] = False
+        self.__dict__["_expire_seconds"] = expire_seconds
+        self.initialize(*args, **kwargs)
+
+        # 每次初始化的时候对 session 进行续期并调用续期回调
+        if kwargs.get("renew", True):
+            self.renew()
+
+    @staticmethod
+    def generate_id():
+        """生成 Session ID"""
+        return str(uuid.uuid1())
+
+    @staticmethod
+    def get_extra_kwargs(handler):
+        """根据 :class:`~tornado.web.RequestHandler` 返回额外的参数"""
+        return {}
+
+    def renew(self):
+        """更新 session 续期"""
+        raise NotImplementedError()
+
+    @property
+    def session_id(self):
+        return self._sid
+
+    @property
+    def session_type(self):
+        return self._type
+
+    @classmethod
+    def _get_cookie_name(cls, handler):
+        """ 获取 Session Id Cookie name
+
+        如果 Handler 实现了 `get_session_cookie_name` 则使用该值
+        否则使用默认值
+        """
+        if hasattr(handler, "get_session_cookie_name"):
+            return handler.get_session_cookie_name()
+
+        return cls._SESSION_COOKIE_KEY
+
+    @classmethod
+    def _get_session_id_with_handler(cls, handler, cookie_name):
+        session_id = handler.get_secure_cookie(cookie_name)
+
+        if isinstance(session_id, six.binary_type):
+            # 从 Cookie 中获取的值为字节序的话在 Python 3 拼接字符串时
+            # 会将 repr 拼接进去("b'session-id'"), 所以这里将字节序转换为
+            # Unicode
+            return session_id.decode("utf8")
+        return session_id
+
+    @staticmethod
+    def get_session_type_from_handler(handler):
+        if hasattr(handler, "get_session_type"):
+            return handler.get_session_type()
+        else:
+            return ""
+
+    @classmethod
+    def make_from_handler(cls, handler, clear_cookie=False, *args, **kwargs):
+        """根据 :class:`tornado.web.RequestHandler` 或其子类构建 Session.
+        当前构造函数尝试从 Cookie 中获取 Session ID, 如获取不到则生成一个并写入到
+        Cookie 中.
+
+        :type handler: :class:`~tornado.web.RequestHandler`
+        :param bool clear_cookie: 清除 Session 的同时也清除对应的 Cookie
+        """
+        # 如果检测到头中包含 JWT 认证头则尝试使用 JWT 构建 Session
+
+        if handler.is_jwt_authorized():
+            return cls._make_from_jwt(handler, *args, **kwargs)
+
+        cookie_name = cls._get_cookie_name(handler)
+        session_id = cls._get_session_id_with_handler(handler, cookie_name)
+        cookie_domain = getattr(handler.settings, "SESSION_COOKIE_DOMAIN", None)  # noqa
+        if session_id is None:
+            session_id = cls.generate_id()
+            handler.set_secure_cookie(
+                cookie_name, session_id,
+                domain=cookie_domain,
+            )
+
+        if clear_cookie:
+            # 如果清除 Cookie 的话注册钩子
+
+            def on_clear():
+                """清除 Session 同时清除 Cookie"""
+                handler.clear_cookie(cookie_name, domain=cookie_domain)
+
+            kwargs["clear_hooks"] = [on_clear]
+        kwargs.update(cls.get_extra_kwargs(handler))
+        expire_seconds = handler.settings.SESSION_EXPIRE_SECONDS
+        session_type = cls.get_session_type_from_handler(handler)
+
+        return cls(session_id, session_type, expire_seconds, *args, **kwargs)
+
+    @classmethod
+    def _make_from_jwt(cls, handler, *args, **kwargs):
+        """根据 :class:`tornado.web.RequestHandler` 或其子类构建 Session.
+        和 :method:`Session.make_from_handler` 的区别是当前通过 JSON Web Token
+        替代 Cookie 构建 Session.
+
+        :type handler: :class:`~tornado.web.RequestHandler`
+        """
+        session_id = handler.jwt_payload["session_id"]
+        handler.logger.info(
+            "Got session id(%s) from JWT(%s)", session_id, handler.jwt_token,
+        )
+        kwargs.update(cls.get_extra_kwargs(handler))
+        expire_seconds = handler.settings.SESSION_EXPIRE_SECONDS
+        session_type = cls.get_session_type_from_handler(handler)
+        return cls(session_id, session_type, expire_seconds, *args, **kwargs)
+
+    def initialize(self):
+        pass
+
+    def get(self, name):
+        raise NotImplementedError
+
+    def set(self, name, val):
+        raise NotImplementedError
+
+    def delete(self, name):
+        """ 覆盖此方法用于删除 session 中某一个值 """
+        raise NotImplementedError
+
+    def clear(self):
+        for hook in self._clear_hooks:
+            hook()
+
+        if hasattr(self, "_clear_data") and callable(self._clear_data):
+            self._clear_data()
+
+        self.sync()
+
+    def sync(self):
+        raise NotImplementedError
+
+    def __delattr__(self, name):
+        self.delete(name)
+
+    def __delitem__(self, name):
+        self.delete(name)
+
+    def __getattr__(self, name):
+        return self.get(name)
+
+    def __setattr__(self, name, val):
+        self.set(name, val)
+
+    def __getitem__(self, name):
+        return self.get(name)
+
+    def __setitem__(self, name, val):
+        return self.set(name, val)
+
+    def __eq__(self, other):
+        """判断两个 Session 是否相等
+
+        :type other: :class:`.Session`
+        """
+        if not isinstance(other, Session):
+            return False
+
+        return (
+            self.session_id == other.session_id
+            and self.session_type == other.session_type
+        )
+
+    def __hash__(self):
+        return binascii.crc32(
+            "{}-{}".format(self.session_id, self.session_type).encode('utf8'),
+        ) & 0xffffffff

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试</title>
+    <link href="{{ static('main.css') }}" rel="stylesheet">
+{#    <link href="{% static 'main.css' %}" rel="stylesheet">#}
+</head>
+<body>
+    <div class="main">
+        <h1>OK</h1>
+        {% if key %}
+            <h2>{{ key }}</h2>
+        {% endif %}
+        {% if msg %}
+            <h2>{{ msg }}</h2>
+        {% endif %}
+        {% if show_url %}
+            <a href="{{ url('index') }}">跳转测试</a>
+        {% endif %}
+    </div>
+</body>
+</html>
