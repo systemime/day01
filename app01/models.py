@@ -25,6 +25,11 @@ class UserProfile(AbstractUser):
         verbose_name = '用户信息'
         verbose_name_plural = verbose_name
         ordering = ["-create_time"]
+    #
+    # def __str__(self):
+    #     return self.username
 
-    def __str__(self):
-        return self.username
+
+class UserLog(models.Model):
+    name = models.CharField(max_length=20, default="xxx", null=True, blank=True)
+    info = models.CharField(max_length=20, default="xxx", null=True, blank=True)

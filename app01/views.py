@@ -7,7 +7,6 @@ from django.views.decorators.http import require_http_methods
 # 类装饰器
 from django.utils.decorators import method_decorator
 # Gzip
-from django.views.decorators.gzip import gzip_page
 # 缓存模块
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
@@ -17,8 +16,6 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import patch_cache_control
 # 邮件操作
-from django.core.mail import send_mail, send_mass_mail
-from django.core import mail
 # 日志控制
 import logging
 
@@ -28,31 +25,34 @@ from asgiref.sync import sync_to_async
 from aiohttp import ClientSession
 
 # 模型
-from .models import UserProfile
-from .hand import Hand
+from app01.models import UserProfile
+from app01.hand import Hand
+from day01.celery import async_task
+from app01.tasks import select, event_log, my_task1, my_task2, my_task3
+from celery import group, signature
 
-import json
 import requests
 import random
-import time
-import types
 import asyncio
 import aiohttp
 import datetime
 
 
-def test(request):
-    example = UserProfile.objects.get(pk=1)
+async def test(request):
+    # t1 = signature(my_task1, args=(1, 2))
+    # t2 = signature(my_task2, args=(1, 2))
+    # t3 = signature(my_task3, args=(1, 2))
+    # t4 = signature(select, args=(1, ))
+    # my_group = group(t1, t2, t3, t4).apply_async(queue='select_queue')
+    # res = my_group.get()
 
-    # 为一个数据对象增加了新的属性
-    new_hand = Hand("north", "east", "south", "west")
-    example.hand = new_hand
+    t4 = select.delay(1)
+    res = t4.get()
 
-    # 数据访问方式，仅在本次请求中可以对新增对属性进行存取
-    print(example.hand.north)
-
-    example.save()
-    return HttpResponse("ok")
+    # ret = select.apply_async((1, ["north", "east", "south", "west"]), queue='select_queue', countdown=1)
+    # res = async_task.AsyncResult(ret)
+    # print(res.status)
+    return HttpResponse(res)
 
 
 # @method_decorator(gzip_page, name='dispatch')  # 装饰整个类
