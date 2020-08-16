@@ -36,6 +36,7 @@ import random
 import asyncio
 import aiohttp
 import datetime
+import types
 
 
 async def test(request):
@@ -46,8 +47,8 @@ async def test(request):
     # my_group = group(t1, t2, t3, t4).apply_async(queue='select_queue')
     # res = my_group.get()
 
-    t4 = select.delay(1)
-    res = t4.get()
+    t4 = select.apply_async((1,))
+    res = sync_to_async(t4.get)
 
     # ret = select.apply_async((1, ["north", "east", "south", "west"]), queue='select_queue', countdown=1)
     # res = async_task.AsyncResult(ret)

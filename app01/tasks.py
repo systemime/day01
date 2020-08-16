@@ -6,11 +6,15 @@ import asyncio, random
 
 @async_task.task
 def select(num):
+    item = {}
     example = UserProfile.objects.get(pk=num)
     print("查询成功，返回结果 %s" % example.username)
-    name = str(example.username)
-    # asyncio.sleep(random.random())
-    return name
+    item["name"] = str(example.username)
+    # asyncio.sleep(random.randint(4, 9))
+    import requests
+    item["res"] = requests.get("http://geekae.top").text
+    print(item)
+    return item
     # 为一个数据对象增加了新的属性
     # new_hand = Hand(*hand)
     # example.hand = new_hand
