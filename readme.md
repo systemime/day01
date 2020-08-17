@@ -103,6 +103,7 @@ sudo systemctl start celery.service
 systemctl status celery
 ```
 
+### django守护文件配置
 ```shell script
 # django systemctl 配置文件
 
