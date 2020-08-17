@@ -37,9 +37,10 @@ import asyncio
 import aiohttp
 import datetime
 import types
+import json
 
 
-async def test(request):
+async def async_celery(request):
     # t1 = signature(my_task1, args=(1, 2))
     # t2 = signature(my_task2, args=(1, 2))
     # t3 = signature(my_task3, args=(1, 2))
@@ -47,13 +48,25 @@ async def test(request):
     # my_group = group(t1, t2, t3, t4).apply_async(queue='select_queue')
     # res = my_group.get()
 
-    t4 = select.apply_async((1,))
-    res = sync_to_async(t4.get)
-
-    # ret = select.apply_async((1, ["north", "east", "south", "west"]), queue='select_queue', countdown=1)
+    try:
+        t4 = select.apply_async((1,))
+        res = await sync_to_async(t4.get)()  # 空括号实例化SynctoAsync对象，获取返回内容
+    except Exception as err:
+        res = {
+            "code": 502,
+            "status": "异步任务出现错误",
+            "error": str(err)
+        }
+    if not isinstance(res.get('res'), str):
+        res = {
+            "code": 502,
+            "status": "异步任务错误，其类型为 %s" % type(res.get('res'))
+        }
+    # ret = select.apply_async((1, ), queue='select_queue', countdown=1)
     # res = async_task.AsyncResult(ret)
     # print(res.status)
-    return HttpResponse(res)
+    return JsonResponse(res)
+    # return HttpResponse(json.dumps(res, ensure_ascii=False), content_type="application/json")
 
 
 # @method_decorator(gzip_page, name='dispatch')  # 装饰整个类

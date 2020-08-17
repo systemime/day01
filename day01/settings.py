@@ -218,34 +218,32 @@ CELERYD_CONCURRENCY = 2  # celery worker的并发数 命令行 -c 指定的数�
 CELERYD_PREFETCH_MULTIPLIER = 4  # celery worker 每次去 rabbitMQ 取任务的数量, 日后需要区分低频与高频任务分开设置
 CELERYD_MAX_TASKS_PER_CHILD = 100  # 每个worker执行了多少任务就会死掉（重制），默认无限, 业务增长容易爆内存
 # CELERY_DEFAULT_QUEUE = "message_queue"  # 默认的队列，如果一个消息不符合其他的队列就会放在默认队列里面,发现如果设置无法选择其他路由
-CELERY_TASK_RESULT_EXPIRES = 60 * 3  # celery worker 超时 30分钟
+CELERY_TASK_RESULT_EXPIRES = 60 * 3  # celery worker 超时 180s
 
 # 详细队列设置 RabbitMQ 队列设置
-QUEUES = (
+CELERY_QUEUES = (
     # "default_qf": {  # 这是上面指定的默认队列, 另一种写法
     #     "exchange": "default",  # 消息交换机，按路由规则指定到哪个队列
     #     "exchange_type": "direct",  # 交换机类型
     #     "routing_key": "default"  # 路由关键字，交换机按key进行消息投递
     # },
-    # consumer_arguments={'x-priority': 10} 优先级
     Queue(name='select_queue', exchange='select_queue', routing_key='select_router'),  # 队列 - 查询服务
     # Queue(name='cud_queue', exchange='cud_queue', routing_key='cud_router'),  # 队列 - 增删改
 )
 # Queue的路由
-ROUTES = {
+CELERY_ROUTES = {
     'app01.tasks.select': {
             'queue': 'select_queue',
             'routing_key': 'select_router',
+            # 'priority': 10  # 优先级指定 仅在redis或rabbitmq时
     },
-    # 'selectos.tasks.cud_task': {
-    #         'queue': 'cud_queue',
-    #         'routing_key': 'cud_router',
-    # },
 }
 
 # 日志配置
-# CELERYD_LOG_FILE = os.path.join(BASE_DIR, "logs", "celery_work.log")
-# CELERYBEAT_LOG_FILE = os.path.join(BASE_DIR, "logs", "celery_beat.log")
+CELERYD_LOG_FILE = os.path.join(BASE_DIR, "logs", "%n%I.log")
+CELERYD_PID_FILE = os.path.join(BASE_DIR, "logs", "%n.pid")
+CELERYDBEAT_LOG_FILE = os.path.join(BASE_DIR, "logs", "%n_beat.log")
+CELERYBEAT_PID_FILE = os.path.join(BASE_DIR, "logs", "celeryd.pid")
 
 # # 动态定时任务
 # DJANGO_CELERY_BEAT_TZ_AWARE = False

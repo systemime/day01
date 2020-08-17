@@ -1,0 +1,26 @@
+[2020-08-17 15:26:44,748: INFO/MainProcess] Connected to amqp://guest:**@127.0.0.1:5672//
+[2020-08-17 15:26:44,763: INFO/MainProcess] mingle: searching for neighbors
+[2020-08-17 15:26:45,785: INFO/MainProcess] mingle: all alone
+[2020-08-17 15:26:45,799: WARNING/MainProcess] /home/workon/env/envbuild/ddjango/lib/python3.6/site-packages/celery/fixups/django.py:206: UserWarning: Using settings.DEBUG leads to a memory
+            leak, never use this setting in production environments!
+  leak, never use this setting in production environments!''')
+[2020-08-17 15:26:45,799: INFO/MainProcess] worker@geeker ready.
+[2020-08-17 15:30:33,230: INFO/MainProcess] Connected to amqp://guest:**@127.0.0.1:5672//
+[2020-08-17 15:30:33,242: INFO/MainProcess] mingle: searching for neighbors
+[2020-08-17 15:30:34,307: INFO/MainProcess] mingle: all alone
+[2020-08-17 15:35:36,597: INFO/MainProcess] Connected to amqp://guest:**@127.0.0.1:5672//
+[2020-08-17 15:35:36,609: INFO/MainProcess] mingle: searching for neighbors
+[2020-08-17 15:35:37,632: INFO/MainProcess] mingle: all alone
+[2020-08-17 15:35:37,649: WARNING/MainProcess] /home/workon/env/envbuild/ddjango/lib/python3.6/site-packages/celery/fixups/django.py:206: UserWarning: Using settings.DEBUG leads to a memory
+            leak, never use this setting in production environments!
+  leak, never use this setting in production environments!''')
+[2020-08-17 15:35:37,649: INFO/MainProcess] worker@geeker ready.
+[2020-08-17 15:36:13,460: INFO/MainProcess] Received task: app01.tasks.select[523b572b-ceba-437c-8431-c5834562b1c7]  
+[2020-08-17 15:36:37,015: INFO/MainProcess] Received task: app01.tasks.select[cf0e075e-1302-4356-92e7-000a10ceab70]  
+[2020-08-17 15:36:55,522: INFO/MainProcess] Connected to amqp://guest:**@127.0.0.1:5672//
+[2020-08-17 15:36:55,535: INFO/MainProcess] mingle: searching for neighbors
+[2020-08-17 15:36:56,559: INFO/MainProcess] mingle: all alone
+[2020-08-17 15:36:56,575: WARNING/MainProcess] /home/workon/env/envbuild/ddjango/lib/python3.6/site-packages/celery/fixups/django.py:206: UserWarning: Using settings.DEBUG leads to a memory
+            leak, never use this setting in production environments!
+  leak, never use this setting in production environments!''')
+[2020-08-17 15:36:56,575: INFO/MainProcess] worker@geeker ready.

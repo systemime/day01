@@ -12,8 +12,11 @@ def select(num):
     item["name"] = str(example.username)
     # asyncio.sleep(random.randint(4, 9))
     import requests
-    item["res"] = requests.get("http://geekae.top").text
-    print(item)
+    try:
+        item["res"] = requests.get("http://geekae.top").text
+    except Exception as err:
+        item['res'] = str(err)
+    # print(item[:1000])
     return item
     # 为一个数据对象增加了新的属性
     # new_hand = Hand(*hand)

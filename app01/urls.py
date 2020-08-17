@@ -2,7 +2,7 @@ from django.urls import path
 # Gzip
 from django.views.decorators.gzip import gzip_page
 from app01.views import Index, TornAsyncioView, Testasync, Testsync
-from app01.views import current_datetime, test
+from app01.views import current_datetime, async_celery
 
 
 urlpatterns = [
@@ -11,5 +11,5 @@ urlpatterns = [
     path("async/", Testasync.as_view(), name="async"),
     path("sync/", Testsync.as_view(), name="sync"),
     path("torn/", TornAsyncioView.as_view(), name="torn"),
-    path("test/", test, name="test"),
+    path("async_celery/", async_celery, name="async_celery"),
 ]
