@@ -82,12 +82,12 @@ After=network.target
 Type=forking
 EnvironmentFile=/etc/default/celery
 WorkingDirectory=/home/workon/project/ddjango/day01
-ExecStart=/bin/sh -c '/home/workon/env/envbuild/ddjango/bin/python -m ${CELERY_BIN} multi start ${CELERYD_NODES} \
+ExecStart=/bin/sh -c '${WORKON} -m ${CELERY_BIN} multi start ${CELERYD_NODES} \
   -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
   --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'
-ExecStop=/bin/sh -c '/home/workon/env/envbuild/ddjango/bin/python -m ${CELERY_BIN} multi stopwait ${CELERYD_NODES} \
+ExecStop=/bin/sh -c '${WORKON} -m ${CELERY_BIN} multi stopwait ${CELERYD_NODES} \
   --pidfile=${CELERYD_PID_FILE}'
-ExecReload=/bin/sh -c '/home/workon/env/envbuild/ddjango/bin/python -m ${CELERY_BIN} multi restart ${CELERYD_NODES} \
+ExecReload=/bin/sh -c '${WORKON} -m ${CELERY_BIN} multi restart ${CELERYD_NODES} \
   -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
   --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'
 
