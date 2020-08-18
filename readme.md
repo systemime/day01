@@ -14,7 +14,8 @@ pip install -r requestion.txt
 
 ### 启动celery
 > celery -A day01 worker -l info
-> ## 调试
+
+### 调试
 > celery -A day01 worker -l debug
 
 ## nginx配置

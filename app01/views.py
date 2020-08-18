@@ -15,6 +15,16 @@ from django.views.decorators.cache import cache_control
 # 私有缓存控制 2
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import patch_cache_control
+# 数据库事务
+from django.db import transaction
+from django.db.transaction import on_commit
+# 跳转
+from django.http import HttpResponseRedirect
+#
+from django.template.context import RequestContext
+# 模型查询并返回http
+from django.shortcuts import get_object_or_404
+
 # 邮件操作
 # 日志控制
 import logging
@@ -25,10 +35,12 @@ from asgiref.sync import sync_to_async
 from aiohttp import ClientSession
 
 # 模型
-from app01.models import UserProfile
+from app01.models import UserProfile, UserLog
+# 任务
 from app01.hand import Hand
 from day01.celery import async_task
 from app01.tasks import select, event_log, my_task1, my_task2, my_task3
+# celery组，签名
 from celery import group, signature
 
 import requests
@@ -41,6 +53,10 @@ import json
 
 
 async def async_celery(request):
+    """
+    :type test
+    :content celery 签名、组任务，异步视图中获取同步线程中异步任务结果
+    """
     # t1 = signature(my_task1, args=(1, 2))
     # t2 = signature(my_task2, args=(1, 2))
     # t3 = signature(my_task3, args=(1, 2))
@@ -67,6 +83,35 @@ async def async_celery(request):
     # print(res.status)
     return JsonResponse(res)
     # return HttpResponse(json.dumps(res, ensure_ascii=False), content_type="application/json")
+
+
+# @transaction.atomic  # 在异步视图中，同步的数据库事务装饰器可能存在问题
+async def tran_handler(request):
+    """
+    view type：test
+    content：数据库事务 celery异步 视图异步
+    """
+    def create_db():
+        try:
+            with transaction.atomic():
+                article = UserLog.objects.create(
+                    name="测试",
+                    info="测试视图"
+                )
+            return article.pk
+        except Exception as err:
+            return err
+
+    article = await sync_to_async(create_db)()
+    # https://docs.celeryproject.org/en/stable/userguide/tasks.html#database-transactions
+    # 如果任务在提交事务之前开始执行，则存在竞争条件。
+    # on_commit成功提交所有事务后，使用回调启动您的Celery任务 django version > 1.9
+    sync_to_async(on_commit(lambda: select.delay(article if article == 1 else 1)))
+    # 但是on_commit无法返回匿名函数结果，忽略装饰器，使用with语法保证异步效率
+    res = await sync_to_async(select.apply_async((article if article == 1 else 1, )).get)()
+    # print(res.keys())
+    # return HttpResponseRedirect('/app01/example/')
+    return HttpResponse("OK")
 
 
 # @method_decorator(gzip_page, name='dispatch')  # 装饰整个类
@@ -271,3 +316,17 @@ class TornAsyncioView(View):
 #         time.sleep(sleep_time)
 #         return 77
 
+
+def request_def(request):
+    result = get_object_or_404(UserLog, pk=1).name
+    if 'HTTP_X_FORWARDED_FOR' in request.META:
+        ip = request.META.get('HTTP_X_FORWARDED_FOR')
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    print(ip, result)
+    html = []
+    tuple_dict = request.META.items()
+    for k, v in tuple_dict:
+        html.append('<tr><td>%s</td><td>%s</td></tr>' % (k, v))
+
+    return HttpResponse('<table>%s</table>' % '\n'.join(html))
