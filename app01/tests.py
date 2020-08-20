@@ -2,6 +2,10 @@ import asyncio
 from pyppeteer import launch
 from pyquery import PyQuery as pq
 import time, random
+from bs4 import BeautifulSoup
+# https://pyppeteer.github.io/pyppeteer/reference.html?highlight=launch#pyppeteer.launcher.launch
+
+
 USER_AGENTS = [
     "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
     "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Acoo Browser; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)",
@@ -72,6 +76,27 @@ async def scrollToButtom(page):
     print("滑动到当前界面底部【完毕】")
 
 
+async def find_iframe(browser, page):
+    try:
+        await asyncio.sleep(1)
+
+        frame = page.frames
+        print(frame)  # 需要找到是哪一个 frame
+        title = await frame[1].title()
+        print(title)
+        await asyncio.sleep(1)
+        login = await frame[1].querySelector('#switcher_plogin')
+        print(login)
+        await login.click()
+
+        await asyncio.sleep(20)
+    except Exception as e:
+        print(e, "EEEEEEEEE")
+
+    for _page in await browser.pages():
+        await _page.close()
+
+
 async def main():
 
     js1 = '''() =>{ Object.defineProperties(navigator,{ webdriver:{ get: () => false } }) }'''
@@ -114,11 +139,76 @@ async def main():
         'Connection': 'keep-alive',
         'Accept-Encoding': 'gzip, deflate',
     })
-    await page.goto('https://www.baidu.com/')
+    # 为False忽略js渲染
+    await page.setJavaScriptEnabled(enabled=True)
+    await page.goto('https://blog.csdn.net/m0_46521476/article/details/107903174', options={'timeout': 1000})
     await page.evaluate(js1, js3, js4, js5)
+    # 刷新后页面webdriver属性不变
+    await page.evaluateOnNewDocument('() =>{ Object.defineProperties(navigator,'
+                                     '{ webdriver:{ get: () => false } }) }')
+    # # 截图
     # await page.evaluate(js2)
     # await page.screenshot({'path': 'example.png'})
-    doc = pq(await page.content())
+
+    # 获取页面title
+    title = await page.title()
+    print("页面标题为：", title)
+
+    # 获取主体
+    doc = await page.content()  # 获取html
+    # with open("index.html", "w+") as f:
+    #     f.write(doc)
+
+    # 抓取新闻内容  可以使用 xpath 表达式
+    """
+    # Pyppeteer 三种解析方式
+    Page.querySelector()  # 选择器
+    Page.querySelectorAll()
+    Page.xpath()  # xpath  表达式
+    # 简写方式为：
+    Page.J(), Page.JJ(), and Page.Jx()
+    """
+    element = await page.querySelector(".feed-infinite-wrapper > ul>li")  # 纸抓取一个
+    print(element)
+    # 获取所有文本内容  执行 js
+    content = await page.evaluate('(element) => element.textContent', element)
+    print(content)
+
+    # elements = await page.xpath('//div[@class="title-box"]/a')
+    elements = await page.querySelectorAll(".title-box a")
+    for item in elements:
+        print(await item.getProperty('textContent'))
+        # <pyppeteer.execution_context.JSHandle object at 0x000002220E7FE518>
+
+        # 获取文本
+        title_str = await (await item.getProperty('textContent')).jsonValue()
+
+        # 获取链接
+        title_link = await (await item.getProperty('href')).jsonValue()
+        print(title_str)
+        print(title_link)
+
+    """
+    今日头条：抓取范例
+    # 抓取新闻标题
+    title_elements = await page.xpath('//div[@class="title-box"]/a')
+    for item in title_elements:
+        # 获取文本
+        title_str = await (await item.getProperty('textContent')).jsonValue()
+        print(await item.getProperty('textContent'))
+        # 获取链接
+        title_link = await (await item.getProperty('href')).jsonValue()
+        print(title_str)
+        print(title_link)
+    """
+
+    titles = BeautifulSoup(doc, 'lxml').find_all('div')
+    print("页面主体为：")
+    for i in titles:
+        print(i.find('p'))
+
+    # 内容长度
+    doc = pq(doc)
     print('Quotes:', doc('.quote').length)
 
     await browser.close()
