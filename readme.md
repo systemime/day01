@@ -1,3 +1,6 @@
+## 更新中
+django 3.1
+
 ## 环境导出/安装
 
 pip freeze > requestion.txt
