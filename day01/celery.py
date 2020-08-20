@@ -12,7 +12,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'day01.settings')
 async_task = Celery('day01')
 
 # 这里使用字符串以使celery的worker不用为子进程序列化配置对象。
-async_task.config_from_object('django.conf:settings')
+async_task.config_from_object('django.conf:settings', namespace='CELERY')
 
 # # 自动加载每个应用(app)目录下的tasks.py文件
 async_task.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

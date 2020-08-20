@@ -5,6 +5,11 @@ import asyncio, random
 
 
 @async_task.task
+def add(a, b):
+    return a+b
+
+
+@async_task.task
 def select(num):
     item = {}
     example = UserProfile.objects.get(pk=num)

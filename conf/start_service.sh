@@ -36,3 +36,17 @@ nohup celery -A day01 beat -l info > logs/celery_beat.log 2>&1 &
 # nohup celery -A day01 worker -l info -P eventlet > logs/celery.log 2>&1 &
 # 合并
 # celery -A Vbox worker -b -l info
+
+# sudo ln -s /usr/local/python3/bin/python3 /usr/bin/python3
+# sudo ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3
+# sudo ln -s /usr/local/python3/bin/easy_install-3.7 /usr/bin/easy_install-3.7
+# sudo ln -s /usr/local/python3/bin/pip3.7 /usr/bin/pip3.7
+# sudo ln -s /usr/local/python3/bin/pydoc3 /usr/bin/pydoc3
+# sudo ln -s /usr/local/python3/bin/pydoc3.7 /usr/bin/pydoc3.7
+# sudo ln -s /usr/local/python3/bin/python3.7 /usr/bin/python3.7
+# sudo ln -s /usr/local/python3/bin/python3.7-config /usr/bin/python3.7-config
+# sudo ln -s /usr/local/python3/bin/python3.7m /usr/bin/python3.7m
+# sudo ln -s /usr/local/python3/bin/python3.7m-config /usr/bin/python3.7m-config
+# sudo ln -s /usr/local/python3/bin/python3-config /usr/bin/python3-config
+# sudo ln -s /usr/local/python3/bin/pyvenv /usr/bin/pyvenv
+# sudo ln -s /usr/local/python3/bin/pyvenv-3.7 /usr/bin/pyvenv-3.7

@@ -25,11 +25,10 @@ from django.template.context import RequestContext
 # 模型查询并返回http
 from django.shortcuts import get_object_or_404
 
-# 邮件操作
 # 日志控制
 import logging
 
-
+# 异步包装
 from asgiref.sync import async_to_sync
 from asgiref.sync import sync_to_async
 from aiohttp import ClientSession
@@ -39,9 +38,12 @@ from app01.models import UserProfile, UserLog
 # 任务
 from app01.hand import Hand
 from day01.celery import async_task
-from app01.tasks import select, event_log, my_task1, my_task2, my_task3
+from app01.tasks import select, event_log, my_task1, my_task2, my_task3, add
 # celery组，签名
 from celery import group, signature
+# 日志处理
+from celery.utils.log import get_logger
+logger = get_logger(__name__)
 
 import requests
 import random
@@ -55,7 +57,7 @@ import json
 async def async_celery(request):
     """
     :type test
-    :content celery 签名、组任务，异步视图中获取同步线程中异步任务结果
+    :content celery 签名、组任务等，异步视图中获取同步线程中异步任务结果
     """
     # t1 = signature(my_task1, args=(1, 2))
     # t2 = signature(my_task2, args=(1, 2))
@@ -78,9 +80,50 @@ async def async_celery(request):
             "code": 502,
             "status": "异步任务错误，其类型为 %s" % type(res.get('res'))
         }
+
+    # # 获取该任务的实例化对象，参数task_id
     # ret = select.apply_async((1, ), queue='select_queue', countdown=1)
     # res = async_task.AsyncResult(ret)
     # print(res.status)
+
+    # # 分块 https://docs.celeryproject.org/en/stable/userguide/canvas.html#chunks
+    # # 分块可让您将可重复的工作分成多个部分，这样，如果您有一百万个对象，则可以创建10个任务，每个任务有十万个对象。
+    # # 有些人可能会担心将任务分块会导致并行度降低，但是对于繁忙的集群而言，情况很少如此，
+    # # 实际上，因为避免了消息传递的开销，这可能会大大提高性能。
+    # res = add.chunks(zip(range(100), range(100)), 10)()
+    # print(res.get())
+    # # apply_async将创建一个专用任务，以便将各个任务应用在工作程序中
+    # add.chunks(zip(range(100), range(100)), 10).apply_async()
+    # # 您还可以将块转换为组：
+    # group = add.chunks(zip(range(100), range(100)), 10).group()
+    # # 并且随着组的倾斜，每个任务的倒数以1为增量：
+    # # 这意味着第一个任务的倒计时为一秒，第二个任务的倒计时为两秒，依此类推。
+    # group.skew(start=1, stop=10)()
+
+    # # 对任务对撤销
+    # result.revoke()
+    # AsyncResult(id).revoke()
+    # app.control.revoke('d9078da5-9915-40a0-bfa1-392c7bde42ed', terminate=True, signal='SIGKILL')
+
+    # # 回调
+    # # 首先执行(2, 2)计算，计算结果与16再次使用add计算
+    # # add.s是签名, retry为false不重试
+    # add.apply_async((2, 2), link=add.s(16), retry=True, retry_policy={
+    #     'max_retries': 3,  # 放弃之前的最大重试次数，将引发导致重试失败的异常。 值None意味着它将永远重试。 默认为重试3次。
+    #     'interval_start': 0,  # 定义两次重试之间要等待的秒数（浮点数或整数）。默认值为0（第一次重试将立即执行）
+    #     'interval_step': 0.2,  # 每次连续重试时，此数字将被添加到重试延迟中（浮点数或整数）。默认值为0.2
+    #     'interval_max': 0.2,  # 重试之间等待的最大秒数（浮点数或整数）。默认值为0.2
+    # })
+
+    # # 错误处理，retry=false时，任务失败立即发生该异常
+    # try:
+    #     add.delay(2, 2)
+    # except add.OperationalError as exc:
+    #     logger.exception('Sending task raised: %r', exc)
+
+    # # 压缩： https://docs.celeryproject.org/en/stable/userguide/calling.html?highlight=group#compression
+    # add.apply_async((2, 2), compression='zlib')
+
     return JsonResponse(res)
     # return HttpResponse(json.dumps(res, ensure_ascii=False), content_type="application/json")
 
@@ -91,6 +134,7 @@ async def tran_handler(request):
     view type：test
     content：数据库事务 celery异步 视图异步
     """
+
     def create_db():
         try:
             with transaction.atomic():
@@ -108,7 +152,7 @@ async def tran_handler(request):
     # on_commit成功提交所有事务后，使用回调启动您的Celery任务 django version > 1.9
     sync_to_async(on_commit(lambda: select.delay(article if article == 1 else 1)))
     # 但是on_commit无法返回匿名函数结果，忽略装饰器，使用with语法保证异步效率
-    res = await sync_to_async(select.apply_async((article if article == 1 else 1, )).get)()
+    res = await sync_to_async(select.apply_async((article if article == 1 else 1,)).get)()
     # print(res.keys())
     # return HttpResponseRedirect('/app01/example/')
     return HttpResponse("OK")
@@ -116,24 +160,25 @@ async def tran_handler(request):
 
 # @method_decorator(gzip_page, name='dispatch')  # 装饰整个类
 class Index(View):
-
     # 私有缓存控制 1，请求方法限制，缓存并缓存时间
     get_decorators = [cache_control(private=True), require_http_methods(['GET', ]), cache_page(60 * 15)]
 
     # @method_decorator(patch_cache_control())
     @method_decorator(get_decorators)
     def get(self, request):
-        name = cache.get('my_key')
-        # cache.get_many(['a', 'b', 'c'])
-        # cache.delete('xxx')
-        # cache.delete_many(['a', 'b', 'c'])
-        # cache.clear()
-        # # 重新设置过期时间
-        cache.touch('my_key', 60 * 15)
-        # # 缓存增 1
-        # cache.incr(key, delta=1, version=None)
-        # # 缓存减 1
-        # cache.decr(key, delta=1, version=None)
+        # django-redis 锁/支持分布式
+        with cache.lock("my_key"):
+            name = cache.get('my_key')
+            # cache.get_many(['a', 'b', 'c'])
+            # cache.delete('xxx')
+            # cache.delete_many(['a', 'b', 'c'])
+            # cache.clear()
+            # # 重新设置过期时间
+            cache.touch('my_key', 60 * 15)
+            # # 缓存增 1
+            # cache.incr(key, delta=1, version=None)
+            # # 缓存减 1
+            # cache.decr(key, delta=1, version=None)
 
         logger = logging.getLogger(__name__)
         logger.info('Something went send!')
@@ -199,7 +244,8 @@ class Testasync(View):
 
 
 class Testsync(View):
-    def get_username(self):
+    @staticmethod
+    def get_username():
         user = UserProfile.objects.last()
         return user.username
 
@@ -207,7 +253,7 @@ class Testsync(View):
         now = datetime.datetime.now()
         data = requests.get("https://www.baidu.com").text
 
-        username = self.get_username()
+        username = Testsync.get_username()
         html = f"<html><body>Hey, {username}, it is now {now}. " \
                f"Here's your random cat fact: {data}</body></html>"
         return html

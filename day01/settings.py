@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'gunicorn',
     'celery',
     'app01.apps.App01Config',
+    'app02.apps.App02Config',
     'chat'
 ]
 
@@ -148,7 +149,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # media是约定成俗的文件夹
 # SuspiciousOperation (TooManyFieldsSent) is raised.
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000
 
-# -- 用户模型
+# -- 用户继承模型
 AUTH_USER_MODEL = 'app01.UserProfile'
 
 # -- 异步安全选项
@@ -170,7 +171,7 @@ AUTH_USER_MODEL = 'app01.UserProfile'
 # https://docs.djangoproject.com/en/3.1/topics/async/#async-safety
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
-# Channels
+# -- Channels
 ASGI_APPLICATION = 'day01.routing.application'
 CHANNEL_LAYERS = {
     'default': {
@@ -181,6 +182,7 @@ CHANNEL_LAYERS = {
     },
 }
 
+# -- 缓存配置
 # MemcachedCache 缓存替换原则是LRU算法（速度快，安全性低，数据格式必须简单，弃用换redis）
 CACHES = {
     'default': {
@@ -197,8 +199,9 @@ CACHES = {
     }
 }
 
+
+# -- celery配置
 # Celery application definition 异步任务设置
-# BROKER_URL = 'redis://localhost:6379/0'  # 中间件选择
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'  # RabbitMQ 默认连接
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'  # 结果存放，可用于跟踪结果
 # 存放在django-orm 数据表中
@@ -209,16 +212,15 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 # CELERY_RESULT_SERIALIZER = 'json'  # 结果的序列化方式
 # CELERY_TASK_SERIALIZER = 'json'  # 消息任务的序列化方式
 # 时区
-enable_utc = False
-timezone = TIME_ZONE
+CELERY_ENABLE_UTC = False
+CELERY_TIMEZONE = TIME_ZONE
 
 # 性能配置
-CELERY_FORCE_EXECV = True  # 有些情况可以防止死锁
 CELERYD_CONCURRENCY = 2  # celery worker的并发数 命令行 -c 指定的数目,worker不是越多越好,保证任务不堆积,加上一定新增任务的预留就可以
 CELERYD_PREFETCH_MULTIPLIER = 4  # celery worker 每次去 rabbitMQ 取任务的数量, 日后需要区分低频与高频任务分开设置
 CELERYD_MAX_TASKS_PER_CHILD = 100  # 每个worker执行了多少任务就会死掉（重制），默认无限, 业务增长容易爆内存
 # CELERY_DEFAULT_QUEUE = "message_queue"  # 默认的队列，如果一个消息不符合其他的队列就会放在默认队列里面,发现如果设置无法选择其他路由
-CELERY_TASK_RESULT_EXPIRES = 60 * 3  # celery worker 超时 180s
+CELERY_RESULT_EXPIRES = 60 * 3  # celery worker 超时 180s
 
 # 详细队列设置 RabbitMQ 队列设置
 CELERY_QUEUES = (
@@ -240,10 +242,10 @@ CELERY_ROUTES = {
 }
 
 # 日志配置
-CELERYD_LOG_FILE = os.path.join(BASE_DIR, "logs", "%n%I.log")
-CELERYD_PID_FILE = os.path.join(BASE_DIR, "logs", "%n.pid")
-CELERYDBEAT_LOG_FILE = os.path.join(BASE_DIR, "logs", "%n_beat.log")
-CELERYBEAT_PID_FILE = os.path.join(BASE_DIR, "logs", "celeryd.pid")
+# CELERYD_LOG_FILE = os.path.join(BASE_DIR, "logs", "%n%I.log")
+# CELERYD_PID_FILE = os.path.join(BASE_DIR, "logs", "%n.pid")
+# CELERYDBEAT_LOG_FILE = os.path.join(BASE_DIR, "logs", "%n_beat.log")
+# CELERYBEAT_PID_FILE = os.path.join(BASE_DIR, "logs", "celeryd.pid")
 
 # # 动态定时任务
 # DJANGO_CELERY_BEAT_TZ_AWARE = False
@@ -255,6 +257,7 @@ CELERYBEAT_PID_FILE = os.path.join(BASE_DIR, "logs", "celeryd.pid")
 # # django_celery_beat.models.CrontabSchedule 与像在cron项领域的时间表 分钟小时日的一周 DAY_OF_MONTH month_of_year
 # # django_celery_beat.models.PeriodicTasks 仅用作索引以跟踪计划何时更改
 
+# -- session缓存配置
 # 重建数据库后一定要运行cache.clear()清除缓存中残留的session，否则无法登录
 # cached_db缓存模式，session先存储到缓存中，再存储到数据库（同读取顺序）
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
@@ -271,6 +274,7 @@ SESSION_COOKIE_SECURE = True  # 进行设置True以避免在HTTP上意外传输�
 # SESSION_COOKIE_SECURE = False  # 是否https传输cookie
 # SESSION_COOKIE_HTTPONLY = True  # 是否session的cookie只支持http传输
 
+# -- 邮件配置
 # smtp 服务器地址
 EMAIL_HOST = "smtp.qq.com"
 # 默认端口25，若请求超时可尝试465

@@ -13,7 +13,9 @@ pip install -r requestion.txt
 > uvicorn --host 0.0.0.0 --port 60013 --reload day01.asgi:application
 
 ### 启动celery
-> celery -A day01 worker -l info
+> celery -A day01 worker -c 1  -l info
+> -- worker_concurrency  cpu内核数量
+> -- worker_prefetch_multiplier  并发数量
 
 ### 调试
 > celery -A day01 worker -l debug
