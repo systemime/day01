@@ -5,3 +5,4 @@ from __future__ import absolute_import, unicode_literals
 from .celery import async_task as celery_app
 
 __all__ = ('celery_app',)  # 自动加载所有使用celery装饰器的视图
+

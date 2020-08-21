@@ -13,9 +13,19 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from django.conf import settings
 from kombu import Exchange, Queue
+from app03.app03_middleware import simple_middleware
+# django3.1以后推荐使用链式查找
+from pathlib import Path
+# 自定义的多个setting文件导入
+from split_settings.tools import optional, include
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+# 添加相关目录方法
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -48,16 +58,17 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',  # session支持中间件
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',  # 消息中间件，对cookie等用户会话支持
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 压缩 https://docs.djangoproject.com/en/3.1/ref/middleware/#module-django.middleware.gzip
     'django.middleware.gzip.GZipMiddleware',
     # 添加浏览器支持 https://docs.djangoproject.com/en/3.1/topics/performance/#conditionalgetmiddleware
-    'django.middleware.http.ConditionalGetMiddleware'
+    'django.middleware.http.ConditionalGetMiddleware',
+    'app03.app03_middleware.App03Middle',  # 自定义中间件
 ]
 
 ROOT_URLCONF = 'day01.urls'
@@ -135,12 +146,15 @@ USE_L10N = True
 
 USE_TZ = False
 
+# 把未加/的且未找到对应方法的请求重定向至加/的请求
+APPEND_SLASH = True
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 
 # -- 其他文件路径
 MEDIA_URL = "/media/"      # 跟STATIC_URL类似，指定用户可以通过这个路径找到文件
@@ -152,6 +166,13 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000
 
 # -- 用户继承模型
 AUTH_USER_MODEL = 'app01.UserProfile'
+
+# 导入不同包下的setting内容，include内容不存在会发生IOError，optional()不会引发异常
+include(
+    'app01/urls.py',
+    optional('local_settings.py'),
+    # INSTALLED_APPS=True
+)
 
 # -- 异步安全选项
 # Django的某些关键部分在异步环境中无法安全运行，因为它们的全局状态不支持协同程序。
