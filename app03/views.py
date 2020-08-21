@@ -9,6 +9,4 @@ from app01.models import UserProfile
 async def test(request):
     user = await sync_to_async(UserProfile.objects.first)()
     print(user)
-    return render(request, "text.html")
-
-
+    return render(request, "test.html")

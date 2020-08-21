@@ -150,8 +150,9 @@ async def tran_handler(request):
     # https://docs.celeryproject.org/en/stable/userguide/tasks.html#database-transactions
     # 如果任务在提交事务之前开始执行，则存在竞争条件。
     # on_commit成功提交所有事务后，使用回调启动您的Celery任务 django version > 1.9
-    sync_to_async(on_commit(lambda: select.delay(article if article == 1 else 1)))
     # 但是on_commit无法返回匿名函数结果，忽略装饰器，使用with语法保证异步效率
+    sync_to_async(on_commit(lambda: select.delay(article if article == 1 else 1)))
+
     res = await sync_to_async(select.apply_async((article if article == 1 else 1,)).get)()
     # print(res.keys())
     # return HttpResponseRedirect('/app01/example/')

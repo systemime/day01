@@ -16,6 +16,8 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from app04.urls import websocket
+from app04 import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,4 +25,6 @@ urlpatterns = [
     path('chat/', include("chat.urls")),
     path('app02/', include("app02.urls")),
     path('app03/', include("app03.urls")),
+    path("", views.IndexView.as_view()),
+    path("ws/", views.websocket_view),
 ]
