@@ -7,8 +7,8 @@ from app01.models import UserProfile
 
 
 async def test(request):
-    user = sync_to_async(UserProfile.objects.first())()
+    user = await sync_to_async(UserProfile.objects.first)()
     print(user)
-    return render(request, "test.html")
+    return render(request, "text.html")
 
 

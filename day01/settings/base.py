@@ -10,18 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+# django3.1以后推荐使用链式查找
 from pathlib import Path
 import os
 from django.conf import settings
 from kombu import Exchange, Queue
-from app03.app03_middleware import simple_middleware
-# django3.1以后推荐使用链式查找
-from pathlib import Path
-# 自定义的多个setting文件导入
-from split_settings.tools import optional, include
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+# BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+# 修改settings位置后，需要重新编写BASE_DIR位置
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -85,7 +84,7 @@ TEMPLATES = [
         },
     }, {
         'BACKEND': 'django.template.backends.jinja2.Jinja2',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / 'templates', ],
         'APP_DIRS': True,
         'OPTIONS': {
             'environment': 'day01.base_jinja.environment',
@@ -154,11 +153,12 @@ APPEND_SLASH = True
 
 STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
+STATICFILES_DIRS = [BASE_DIR / "static", ]
 
 # -- 其他文件路径
 MEDIA_URL = "/media/"      # 跟STATIC_URL类似，指定用户可以通过这个路径找到文件
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # media是约定成俗的文件夹名,头像存放
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # media是约定成俗的文件夹名,头像存放
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Maximum number of GET/POST parameters that will be read before a
 # SuspiciousOperation (TooManyFieldsSent) is raised.
@@ -167,12 +167,6 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000
 # -- 用户继承模型
 AUTH_USER_MODEL = 'app01.UserProfile'
 
-# 导入不同包下的setting内容，include内容不存在会发生IOError，optional()不会引发异常
-# include(
-#     'app01/urls.py',
-#     optional('local_settings.py'),
-#     # INSTALLED_APPS=True
-# )
 
 # -- 异步安全选项
 # Django的某些关键部分在异步环境中无法安全运行，因为它们的全局状态不支持协同程序。

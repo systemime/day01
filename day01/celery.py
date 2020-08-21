@@ -8,7 +8,7 @@ from datetime import timedelta
 from celery.schedules import crontab
 
 # 把置默认的django settings模块配置给celery
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'day01.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'day01.settings.base')
 async_task = Celery('day01')
 
 # 这里使用字符串以使celery的worker不用为子进程序列化配置对象。
