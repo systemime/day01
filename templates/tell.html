@@ -23,14 +23,14 @@
 <html>
    <head>
    <meta charset="utf-8">
-   <title>菜鸟教程(runoob.com)</title>
+   <title>WebSocket测试</title>
 
       <script type="text/javascript">
          function WebSocketTest()
          {
             if ("WebSocket" in window)
             {
-               alert("您的浏览器支持 WebSocket!");
+               /*alert("WebSocket 存在");
 
                // 打开一个 web socket
                var ws = new WebSocket("ws://47.100.114.188:60013/ws/");
@@ -52,7 +52,19 @@
                {
                   // 关闭 websocket
                   alert("连接已关闭...");
-               };
+               };*/
+
+                let socket = new WebSocket('ws://47.100.114.188:60013/ws/');
+                let timer = null;
+                socket.onopen = () => {
+                    timer = setInterval(() => {
+                        socket.send('hello');
+                    }, 500);
+                };
+                socket.onclose = socket.onerror = () => {
+                    clearInterval(timer);
+                    alert("链接已关闭")
+                };
             }
 
             else
@@ -67,7 +79,10 @@
    <body>
 
       <div id="sse">
-         <a href="javascript:WebSocketTest()">运行 WebSocket</a>
+          <tr>
+              <td><a href="javascript:WebSocketTest()">运行 WebSocket</a></td>
+          </tr>
+
       </div>
 
    </body>

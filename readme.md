@@ -9,7 +9,7 @@ pip install -r requestion.txt
 ## 项目启动
 ### 启动web服务
 > gunicorn day01.asgi:application -b 0.0.0.0:60013 --reload -w 2 -t 1 -k uvicorn.workers.UvicornWorker
-> 或（nginx代理时推荐）
+> 或（nginx代理时推荐, 如果存在websocket链接，则使用上方方式启动或建立wss链接并配置相应证书）
 > gunicorn day01.asgi:application -b unix:/run/day01/gunicorn.socket --reload -w 1 -t 1 -k uvicorn.workers.UvicornWorker
 
 或

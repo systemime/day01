@@ -180,7 +180,7 @@ class WebSocket:
     async def receive_text(self) -> str:
         message = await self.receive()
         self._test_if_can_receive(message)
-        return message["text"]
+        return message.get("text")
 
     async def receive_bytes(self) -> bytes:
         message = await self.receive()

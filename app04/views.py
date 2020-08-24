@@ -11,7 +11,9 @@ class IndexView(TemplateView):
 
 
 async def websocket_view(socket: WebSocket):
+    # import pdb;pdb.set_trace()
     await socket.accept()
     while True:
         message = await socket.receive_text()
-        await socket.send_text(message)
+        print(message)
+        await socket.send_text(message if message else "")
