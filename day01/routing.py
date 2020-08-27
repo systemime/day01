@@ -1,12 +1,16 @@
-from channels.auth import AuthMiddlewareStack
+# -*- coding: utf-8 -*-
 from channels.routing import ProtocolTypeRouter, URLRouter
-import chat.routing
+from channels.auth import AuthMiddlewareStack  # 使用django自带auth认证获取信息
+from channels.sessions import SessionMiddlewareStack  # 从session中获取信息
+from webchat.routing import websocket_urlpatterns
 
 application = ProtocolTypeRouter({
-    # (http->django views is added by default)
-        'websocket': AuthMiddlewareStack(
+    'websocket': SessionMiddlewareStack(  # 选择中间件
         URLRouter(
-            chat.routing.websocket_urlpatterns
+            # re_path(r'^pod/(?P<name>\w+)', SSHConsumer),
+            # A + B + C + ...  # 导入app中websocket路由
+            websocket_urlpatterns  # 导入app中websocket路由
         )
     ),
 })
+

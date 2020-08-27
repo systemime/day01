@@ -28,12 +28,12 @@ decorator==4.4.2
 Django==3.1
 django-celery-beat==2.0.0
 django-celery-results==1.2.1
-django-channels==0.7.0
 django-cors-headers==3.4.0
+django-filter==2.3.0
 django-redis==4.12.1
 django-rest-framework==0.1.0
 django-timezone-field==4.0
-djangorestframework==3.11.0
+djangorestframework==3.11.1
 dnspython==1.16.0
 eventlet==0.26.1
 future==0.18.2
@@ -53,10 +53,12 @@ ipython-genutils==0.2.0
 itemadapter==0.1.0
 itemloaders==1.0.2
 jedi==0.17.2
+jieba==0.42.1
 Jinja2==2.11.2
 jmespath==0.10.0
 kombu==4.6.11
 lxml==4.5.2
+Markdown==3.2.2
 MarkupSafe==1.1.1
 monotonic==1.5
 msgpack==1.0.0

@@ -1,33 +1,62 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
 
 # Create your models here.
 
 
-class UserProfile(AbstractUser):
-    SEX_CHOICES = (
-        ('male', '男'),
-        ('female', '女')
-    )
-    nick_name = models.CharField(max_length=20, verbose_name='昵称', null=True, blank=True)
-    password = models.CharField(max_length=256, verbose_name='密码')
-    avatar = models.ImageField(upload_to='media', default='default.jpg')
-    sex = models.CharField(max_length=32, choices=SEX_CHOICES, default="male", verbose_name='性别')
-    mobile = models.CharField(max_length=11, verbose_name='手机', null=True, blank=True)
-    address = models.CharField(max_length=200, verbose_name='地址', null=True, blank=True)
-    enabled = models.BooleanField(default=True, verbose_name='是否启用')
-    memo = models.TextField(blank=True, null=True, verbose_name="备注")
-    create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
-    last_login_time = models.DateTimeField(blank=True, null=True, verbose_name='最后登录时间')
-    pod_num = models.IntegerField(null=False, default=0, verbose_name='容器数量')
+class UserManager(BaseUserManager):
+    def create_user(self, email, password=None):
+        """
+        Creates and saves a User with the given email and password.
+        """
+        if not email:
+            raise ValueError('Users must have an email address')
 
-    class Meta:
-        verbose_name = '用户信息'
-        verbose_name_plural = verbose_name
-        ordering = ["-create_time"]
-    #
-    # def __str__(self):
-    #     return self.username
+        user = self.model(
+            email=self.normalize_email(email),
+        )
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password):
+        """
+        Creates and saves a superuser with the given email and password.
+        """
+        user = self.create_user(
+            email,
+            password=password,
+        )
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
+        return user
+
+
+class UserProfile(AbstractBaseUser, PermissionsMixin):
+    name = models.CharField(max_length=50, default='Anonymous')
+    email = models.EmailField(max_length=100, unique=True)
+
+    username = None
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    session_token = models.CharField(max_length=10, default=0)
+
+    active = models.BooleanField(default=True)
+    # a admin user; non super-user
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)  # a superuser
+
+    created_at = models.DateTimeField(
+        auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects = UserManager()
 
 
 class UserLog(models.Model):

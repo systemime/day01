@@ -38,6 +38,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'channels',
+    'channels_redis',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,11 +47,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'gunicorn',
     'celery',
+    'rest_framework',
     'app01.apps.App01Config',
     'app02.apps.App02Config',
     'app03.apps.App03Config',
-    'chat',
-    'app04.apps.App04Config'
+    'app04.apps.App04Config',
+    'webchat.apps.WebchatConfig'
 ]
 
 MIDDLEWARE = [
@@ -153,8 +155,8 @@ APPEND_SLASH = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATICFILES_DIRS = [BASE_DIR / "static", ]
+STATIC_ROOT = BASE_DIR / "static"
+# STATICFILES_DIRS = [BASE_DIR / "static", ]
 
 # -- 其他文件路径
 MEDIA_URL = "/media/"      # 跟STATIC_URL类似，指定用户可以通过这个路径找到文件
@@ -278,14 +280,14 @@ CELERY_ROUTES = {
 # 重建数据库后一定要运行cache.clear()清除缓存中残留的session，否则无法登录
 # cached_db缓存模式，session先存储到缓存中，再存储到数据库（同读取顺序）
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
-# SESSION_ENGINE = "django.contrib.sessions.backends.cache"  # 官方
+# # SESSION_ENGINE = "django.contrib.sessions.backends.cache"  # 官方
 SESSION_CACHE_ALIAS = "default"
-# session 过期时间， django 本身要么设置固定时间，要么关闭浏览器失效
-SESSION_COOKIE_AGE = 60 * 240  # 4小时
+# # session 过期时间， django 本身要么设置固定时间，要么关闭浏览器失效
+# SESSION_COOKIE_AGE = 60 * 240  # 4小时
 SESSION_SAVE_EVERY_REQUEST = True  # 是否每次请求都保存session，默认修改后才保存 即，false到期实际马上失效，true每次请求重新计时
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 关闭浏览器，则COOKIE失效
 SESSION_COOKIE_NAME = "vboxsuper"  # 浏览器中session字符串key标识
-SESSION_COOKIE_SECURE = True  # 进行设置True以避免在HTTP上意外传输会话cookie
+# SESSION_COOKIE_SECURE = True  # 进行设置True以避免在HTTP上意外传输会话cookie
 # SESSION_COOKIE_DOMAIN = None  # session的cookie保存的域名(在哪个域名下可用,None 子域名)
 # SESSION_COOKIE_PATH = "/"  # 默认所有页面都能使用session
 # SESSION_COOKIE_SECURE = False  # 是否https传输cookie
@@ -336,3 +338,4 @@ DEFAULT_FROM_EMAIL = "Vbox 注册 <cchandler@qq.com>"
 # EMAIL_HOST_USER = 'cchandler@qq.com'
 # EMAIL_HOST_PASSWORD = 'erqlgnfdeuefbcad'
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
