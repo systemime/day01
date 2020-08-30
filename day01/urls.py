@@ -24,5 +24,5 @@ urlpatterns = [
     path('app02/', include("app02.urls")),
     path('app03/', include("app03.urls")),
     path("app04/", include("app04.urls")),
-    path("webchat/", include("webchat.urls")),
+    path("webchat/", include("webchat.urls"))
 ]

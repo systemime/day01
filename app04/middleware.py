@@ -17,16 +17,17 @@ import django
 import importlib
 
 from django.core.handlers.asgi import ASGIHandler
-from channels import routing
+from channels.routing import get_default_application as channels_get_default_application
 
 
 def get_asgi_application():
     """
     重载方法，支持websocket
     """
-    django.setup(set_prefix=False)
-    # return RefactorASGIHandlerOne()
+    django.setup()
     return RefactorASGIHandlerTwo()
+    # django.setup(set_prefix=False)
+    # return RefactorASGIHandlerOne()
 
 
 class RefactorASGIHandlerTwo(ASGIHandler):
@@ -37,7 +38,8 @@ class RefactorASGIHandlerTwo(ASGIHandler):
     """
     async def __call__(self, scope, receive, send):
         if scope["type"] == "websocket":
-            return routing.get_default_application()
+            print("传入一个websocket链接")
+            return channels_get_default_application()
 
         await super().__call__(scope, receive, send)
 

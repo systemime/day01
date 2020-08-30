@@ -37,8 +37,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'channels',
-    'channels_redis',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,12 +45,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'gunicorn',
     'celery',
+    'channels',
+    'channels_redis',
     'rest_framework',
     'app01.apps.App01Config',
     'app02.apps.App02Config',
     'app03.apps.App03Config',
     'app04.apps.App04Config',
-    'webchat.apps.WebchatConfig'
+    'webchat'
 ]
 
 MIDDLEWARE = [
@@ -192,6 +192,7 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 # -- Channels
 ASGI_APPLICATION = 'day01.routing.application'
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
