@@ -30,26 +30,25 @@ from django.test import TestCase
 
 a = ['s1', 's3', 's9', 's4', 'h1', 'p3', 'p2', 'q5', 'q4', 'q9', 'k1', 'k2']
 
+
 def fun(cards):
     if not cards:
         return
     # 先按照字母顺序排序123456
-    b= sorted(cards)
+    b = sorted(cards)
     # 获取花色列表（保留花色大小顺序）
-    s = ['k', 's', 'h', 'p', 'q']
-    ss = {i[:1] for i in cards}
-    for i in s:
-        if i not in ss:
-            s.pop(s.index(i))
+    sun = {i[:1] for i in cards}
+    s = [i for i in ['k', 's', 'h', 'p', 'q'] if i in sun]
     # 按照花色大小顺序，顺序从cards中取卡牌放到新数组中
     arr = []
     for k in s:
         for i in b:
             if k in i:
                 arr.append(cards.pop(cards.index(i)))
-        if not a:
+        if not arr:
             break
     return arr
+
 
 print(fun(a))
 

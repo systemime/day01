@@ -169,18 +169,18 @@ class Index(View):
     def get(self, request):
         # django-redis 锁/支持分布式
         # ----- 有问题 -----
-        with cache.lock("my_key"):
-            name = cache.get('my_key')
-            # cache.get_many(['a', 'b', 'c'])
-            # cache.delete('xxx')
-            # cache.delete_many(['a', 'b', 'c'])
-            # cache.clear()
-            # # 重新设置过期时间
-            cache.touch('my_key', 60 * 15)
-            # # 缓存增 1
-            # cache.incr(key, delta=1, version=None)
-            # # 缓存减 1
-            # cache.decr(key, delta=1, version=None)
+        # with cache.lock("my_key"):
+        #     name = cache.get('my_key')
+        #     # cache.get_many(['a', 'b', 'c'])
+        #     # cache.delete('xxx')
+        #     # cache.delete_many(['a', 'b', 'c'])
+        #     # cache.clear()
+        #     # # 重新设置过期时间
+        #     cache.touch('my_key', 60 * 15)
+        #     # # 缓存增 1
+        #     # cache.incr(key, delta=1, version=None)
+        #     # # 缓存减 1
+        #     # cache.decr(key, delta=1, version=None)
 
         logger = logging.getLogger(__name__)
         logger.info('Something went send!')
@@ -188,7 +188,7 @@ class Index(View):
         context = {
             "key": "asdfo23jhj45k2l",
             "msg": "你好",
-            "name": name
+            "name": "xxx"
         }
         return render(request, "index.html", context)
 

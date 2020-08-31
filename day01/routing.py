@@ -2,6 +2,7 @@
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack  # 使用django自带auth认证获取信息
 from channels.sessions import SessionMiddlewareStack  # 从session中获取信息
+from channels import TokenAuthMiddleware
 from webchat.routing import websocket_urlpatterns
 
 application = ProtocolTypeRouter({
