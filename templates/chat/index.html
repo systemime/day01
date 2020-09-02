@@ -9,7 +9,7 @@
 {% block js %}
 <script>
   var chatSocket = new WebSocket(
-    'ws://' + window.location.host + ':60013' + '/ws/chat/');
+    'ws://' + window.location.host + ':60013' + '/ws/chat/xxoooxx/');
 
   chatSocket.onmessage = function(e) {
     var data = JSON.parse(e.data);

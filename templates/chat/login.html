@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form action="{{ url('login-url') }}" method="post" class="mb-2 login-form" onsubmit="return login_form();">
+        {{ csrf_input }}
+        <div class="input-group">
+          <input type="username" class="form-control" name="username" placeholder="用户名" id="username" value="systemime" onkeyup="check_username();" onblur="check_username();">
+          <div class="input-group-append input-group-text" id="username-icon">
+              <span class="fas fa-envelope"></span>
+          </div>
+        </div>
+		<div class="input-group mb-3">
+			<span id="username_error" style="color:red;"></span>
+		</div>
+
+        <div class="input-group">
+          <input type="password" class="form-control" name="password" placeholder="密码" id="password" value="123456" onkeyup="check_password();" onblur="check_password();">
+          <div class="input-group-append input-group-text" id="password-icon">
+              <span class="fas fa-lock"></span>
+          </div>
+        </div>
+		<div class="input-group mb-3">
+			<span id="password_error" style="color:red;"></span>
+		</div>
+        <div class="row">
+          <!-- /.col -->
+          <div class="col">
+            <button type="submit" class="btn btn-success btn-block">确定</button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
+</body>
+</html>

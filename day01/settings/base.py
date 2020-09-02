@@ -13,8 +13,10 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 # django3.1以后推荐使用链式查找
 from pathlib import Path
 import os
-from django.conf import settings
 from kombu import Exchange, Queue
+
+# 导入webchat的setting 请勿删除
+from webchat.settings import *
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -197,7 +199,8 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            # "hosts": [('127.0.0.1', 6379)],
+            "hosts": ["redis://127.0.0.1:6379/2"],
         },
     },
 }
@@ -223,7 +226,7 @@ CACHES = {
 # -- celery配置
 # Celery application definition 异步任务设置
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'  # RabbitMQ 默认连接
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'  # 结果存放，可用于跟踪结果
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/2'  # 结果存放，可用于跟踪结果
 # 存放在django-orm 数据表中
 # CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
@@ -250,20 +253,24 @@ CELERY_QUEUES = (
     #     "routing_key": "default"  # 路由关键字，交换机按key进行消息投递
     # },
     Queue(name='select_queue', exchange='select_queue', routing_key='select_router'),  # 队列 - 查询服务
-    # Queue(name='cud_queue', exchange='cud_queue', routing_key='cud_router'),  # 队列 - 增删改
+    Queue(name='tailf_queue', exchange='tailf_queue', routing_key='tailf_queue'),  # 队列 - 监听日志
 )
 # Queue的路由
 CELERY_ROUTES = {
     'app01.tasks.select': {
-            'queue': 'select_queue',
-            'routing_key': 'select_router',
-            # 'priority': 10  # 优先级指定 仅在redis或rabbitmq时
+        'queue': 'select_queue',
+        'routing_key': 'select_router',
+        # 'priority': 10  # 优先级指定 仅在redis或rabbitmq时
+    },
+    'webchat.tasks.tailf': {
+        'queue': 'tailf_queue',
+        'routing_key': 'tailf_queue'
     },
 }
 
-# 日志配置
-# CELERYD_LOG_FILE = os.path.join(BASE_DIR, "logs", "%n%I.log")
-# CELERYD_PID_FILE = os.path.join(BASE_DIR, "logs", "%n.pid")
+# # 日志配置
+# CELERYD_LOG_FILE = BASE_DIR / "logs/%n%I.log"
+# CELERYD_PID_FILE = BASE_DIR / "logs/%n.pid"
 # CELERYDBEAT_LOG_FILE = os.path.join(BASE_DIR, "logs", "%n_beat.log")
 # CELERYBEAT_PID_FILE = os.path.join(BASE_DIR, "logs", "celeryd.pid")
 

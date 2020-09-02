@@ -24,8 +24,9 @@ def get_asgi_application():
     """
     重载方法，支持websocket
     """
-    django.setup()
-    return RefactorASGIHandlerTwo()
+    django.setup(set_prefix=False)
+    return channels_get_default_application()
+    # return RefactorASGIHandlerTwo()
     # django.setup(set_prefix=False)
     # return RefactorASGIHandlerOne()
 
