@@ -5,7 +5,8 @@ cd ../
 # --------------------------------Gunicorn----------------------------------------
 # # run gunicorn
 ## by socket
-gunicorn day01.asgi:application -b unix:/run/day01/gunicorn.socket --reload -w 2 -t 1 -k uvicorn.workers.UvicornWorker
+# gunicorn day01.asgi:application -b unix:/run/day01/gunicorn.socket --reload -w 2 -t 1 -k uvicorn.workers.UvicornWorker
+gunicorn -c conf/start_gunicorn.py day01.asgi:application
 # -----------------------------Other start Asgi-----------------------------------
 ## by TCP
 # gunicorn day01.asgi:application -b 0.0.0.0:60013 --reload -w 2 -t 1 -k uvicorn.workers.UvicornWorker

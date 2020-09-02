@@ -9,6 +9,9 @@ pip install -r requestion.txt
 ## 项目启动
 ### 启动web服务
 > gunicorn day01.asgi:application -b 0.0.0.0:60013 --reload -w 2 -t 1 -k uvicorn.workers.UvicornWorker
+> 自定义的UvicornWorker类，支持参数传递
+> gunicorn -c conf/start_gunicorn.py day01.asgi:application
+> 配合celery task的websocket任务300s后会触发强制超时错误，请合理解决
 > 或（nginx代理时推荐, 如果存在websocket链接，则使用上方方式启动或建立wss链接并配置相应证书）
 > gunicorn day01.asgi:application -b unix:/run/day01/gunicorn.socket --reload -w 1 -t 1 -k uvicorn.workers.UvicornWorker
 
