@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, email, password=None, **extra_fields):
+    def create_user(self, email, username=None, password=None, **extra_fields):
         """
         Creates and saves a User with the given email and password.
         """
@@ -16,15 +16,14 @@ class UserManager(BaseUserManager):
 
         if not email:
             raise ValueError('Users must have an email address')
-        if not username:
-            raise ValueError('The given username must be set')
 
         user = self.model(
             email=self.normalize_email(email),
             **extra_fields
         )
 
-        user.name = self.model.normalize_username(username)
+        if username:
+            user.name = self.model.normalize_username(username)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -34,7 +33,7 @@ class UserManager(BaseUserManager):
         Creates and saves a superuser with the given email and password.
         """
         user = self.create_user(
-            email,
+            email=email,
             password=password,
         )
         user.is_staff = True
@@ -59,6 +58,8 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     # a admin user; non super-user
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)  # a superuser
+
+    friends = models.ManyToManyField('self', verbose_name="好友", blank=True, related_name="user_friends")
 
     created_at = models.DateTimeField(
         auto_now_add=True, blank=True, null=True)

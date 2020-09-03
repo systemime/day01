@@ -1,5 +1,5 @@
 # PS: django的signal是同步的
-# 如果把信号量处理写在项目根目录内的__init__则是全局
+# 如果把信号量处理写在项目根目录内的__init__是全局的，但是如下内置信号量则是全局
 # 内置信号量 https://docs.djangoproject.com/en/3.1/ref/signals/
 from django.db.models.signals import pre_save, post_save
 
@@ -9,7 +9,7 @@ def pre_save_func(sender, **kwargs):
     print("pre_save_msg:", sender, kwargs)
 
 
-pre_save.connect(pre_save_func)  # models对象保存前触发callback函数
+pre_save.connect(pre_save_func)  # models对象使用时触发callback函数
 pre_save.disconnect()  # 关闭信号
 
 
@@ -18,7 +18,7 @@ def post_save_func(sender, **kwargs):
     print("post_save_msg:", sender, kwargs)
 
 
-post_save.connect(post_save_func)  # models对象保存后触发函数
+post_save.connect(post_save_func)  # models对象结束使用后触发函数
 post_save.disconnect()
 
 # 装饰器触发函数
