@@ -10,7 +10,7 @@ def pre_save_func(sender, **kwargs):
 
 
 pre_save.connect(pre_save_func)  # models对象保存前触发callback函数
-pre_save.disconnect()
+pre_save.disconnect()  # 关闭信号
 
 
 def post_save_func(sender, **kwargs):

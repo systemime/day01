@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 from kombu import Exchange, Queue
+from urllib.parse import quote_plus, quote
 
 # 导入webchat的setting 请勿删除
 from webchat.settings import *
@@ -42,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'django.contrib.sessions',  # 同时也是cacahe_db模式必要组件
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'gunicorn',
@@ -110,7 +111,7 @@ DATABASES = {
         "HOST": "127.0.0.1",
         'NAME': 'day01',
         'USER': "root",
-        "PASSWORD": "123456",
+        "PASSWORD": "Admin@2488.m",
         "PORT": 3306
     }
 }
@@ -195,12 +196,15 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 # -- Channels
 ASGI_APPLICATION = 'day01.routing.application'
 
+REDIS_PASSWORD = quote('Admin@2488.r')
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             # "hosts": [('127.0.0.1', 6379)],
-            "hosts": ["redis://127.0.0.1:6379/2"],
+            "hosts": ["redis://:{}@127.0.0.1:6379/2".format("Admin@2488.r")],
+            "symmetric_encryption_keys": [SECRET_KEY],
         },
     },
 }
@@ -216,8 +220,9 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",  # 激活数据压缩
-            "IGNORE_EXCEPTIONS": True,  # 防止redis意外关闭造成异常，memcached backend 的默认行为
-            # "PASSWORD": "密码",
+            "KEY_PREFIX": "day01_test",  # 特定缓存键值对，每个项目均不同，防止不同项目之间的缓存实例混用，不设置本项(不要为空)django自动设置
+            "IGNORE_EXCEPTIONS": True,  # 防止redis意外关闭造成异常，memcached backend 的默认行为 django-redis配置项
+            "PASSWORD": "Admin@2488.r",
         }
     }
 }
@@ -226,7 +231,7 @@ CACHES = {
 # -- celery配置
 # Celery application definition 异步任务设置
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'  # RabbitMQ 默认连接
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/2'  # 结果存放，可用于跟踪结果
+CELERY_RESULT_BACKEND = 'redis://:{}@localhost:6379/2'.format("Admin@2488.r")  # 结果存放，可用于跟踪结果
 # 存放在django-orm 数据表中
 # CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
@@ -269,6 +274,7 @@ CELERY_ROUTES = {
 }
 
 # # 日志配置
+# # systemd已配置
 # CELERYD_LOG_FILE = BASE_DIR / "logs/%n%I.log"
 # CELERYD_PID_FILE = BASE_DIR / "logs/%n.pid"
 # CELERYDBEAT_LOG_FILE = os.path.join(BASE_DIR, "logs", "%n_beat.log")
@@ -289,12 +295,12 @@ CELERY_ROUTES = {
 # cached_db缓存模式，session先存储到缓存中，再存储到数据库（同读取顺序）
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 # # SESSION_ENGINE = "django.contrib.sessions.backends.cache"  # 官方
-SESSION_CACHE_ALIAS = "default"
-# # session 过期时间， django 本身要么设置固定时间，要么关闭浏览器失效
-# SESSION_COOKIE_AGE = 60 * 240  # 4小时
+SESSION_CACHE_ALIAS = "default"  # 缓存
+# # session 过期时间，
+SESSION_COOKIE_AGE = 60 * 60 * 4  # 4小时
 SESSION_SAVE_EVERY_REQUEST = True  # 是否每次请求都保存session，默认修改后才保存 即，false到期实际马上失效，true每次请求重新计时
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 关闭浏览器，则COOKIE失效
-SESSION_COOKIE_NAME = "vboxsuper"  # 浏览器中session字符串key标识
+SESSION_COOKIE_NAME = "geek_ae"  # 浏览器中session字符串key标识
 # SESSION_COOKIE_SECURE = True  # 进行设置True以避免在HTTP上意外传输会话cookie
 # SESSION_COOKIE_DOMAIN = None  # session的cookie保存的域名(在哪个域名下可用,None 子域名)
 # SESSION_COOKIE_PATH = "/"  # 默认所有页面都能使用session

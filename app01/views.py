@@ -171,9 +171,12 @@ class Index(View):
         # ----- 有问题 -----
         # with cache.lock("my_key"):
         #     name = cache.get('my_key')
+        #     # 获取多个缓存结果
         #     # cache.get_many(['a', 'b', 'c'])
+        #     # 删除缓存
         #     # cache.delete('xxx')
         #     # cache.delete_many(['a', 'b', 'c'])
+        #     # 清除所有缓存
         #     # cache.clear()
         #     # # 重新设置过期时间
         #     cache.touch('my_key', 60 * 15)

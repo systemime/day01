@@ -7,17 +7,24 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, username, email, password=None, **extra_fields):
         """
         Creates and saves a User with the given email and password.
         """
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+
         if not email:
             raise ValueError('Users must have an email address')
+        if not username:
+            raise ValueError('The given username must be set')
 
         user = self.model(
             email=self.normalize_email(email),
+            **extra_fields
         )
 
+        user.name = self.model.normalize_username(username)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -45,6 +52,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
+    # 自定义认证
     session_token = models.CharField(max_length=10, default=0)
 
     active = models.BooleanField(default=True)

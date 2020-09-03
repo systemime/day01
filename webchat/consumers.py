@@ -1,7 +1,7 @@
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer, WebsocketConsumer
 import json
-from webchat.tasks import tailf
+from webchat.tasks import tailf, tailf_tail
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -48,7 +48,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # 操作都是在self.room_group_name组内进行
     async def chat_message(self, event):
         print(event)
-        user = self.scope['user'].get_username()
+        # user = self.scope['user'].get_username()
+        user = self.scope['user'].name
         message = user + ":  " + event['message']
 
         # Send message to WebSocket
@@ -61,7 +62,10 @@ class TailfConsumer(WebsocketConsumer):
     def connect(self):
         self.file_id = self.scope["url_route"]["kwargs"]["id"]
 
-        self.result = tailf.delay(self.file_id, self.channel_name)
+        # 这里其实并不适合使用celery监控，实时查看监控可能处在一个较长的时间
+        # celery task任务在--time-limit设置的超时时间后，硬性结束标记任务超时
+        # 目前修改超时为2小时
+        self.result = tailf_tail.delay(self.file_id, self.channel_name)
 
         print('connect:', self.channel_name, self.result.id)
         self.accept()

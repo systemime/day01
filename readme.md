@@ -23,6 +23,11 @@ pip install -r requestion.txt
 > -- worker_concurrency  cpu内核数量
 > -- worker_prefetch_multiplier  并发数量
 
+### 备注
+> 缓存在redis 1库
+> django channles 结果在2库
+> celery 任务结果在2库
+
 ### 调试
 > celery -A day01 worker -l debug
 
@@ -126,6 +131,44 @@ ExecStart=/usr/local/bin/gunicorn day01.asgi:application -b unix:/run/day01/guni
 
 [Install]
 WantedBy=multi-user.target
+```
+
+## docker-compose安装使用
+> pip3 install --upgrade --force-reinstall --no-cache-dir docker-compose
+
+```yaml
+version: '3'
+services:
+    mysql:
+        image: mysql:5.7
+        container_name: mysql01
+        restart: always
+        ports:
+            - "3306:3306"
+        volumes:
+            - ~/docker-com/etc/mysql/conf.d:/etc/mysql/conf.d
+            - ~/docker-com/data/mysql:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: Abc123...
+
+    redis:
+        image: redis
+        container_name: redis01
+        command: redis-server --requirepass Abc123...
+        restart: always
+        ports:
+            - "6379:6379"
+```
+
+```shell script
+docker exec -it redis01 /bin/bash -c "redis-cli -a Abc123..."
+# 或
+docker exec -it redis01 /bin/bash -c "redis-cli -h xxx.xxx.xxx.xxx -p xxxx"
+auth myPassword
+
+# 重设密码
+config set requirepass newPassword
+config get requirepass
 ```
 
 ## 计划更新
