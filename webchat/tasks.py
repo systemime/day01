@@ -65,7 +65,7 @@ def tailf(id, channel_name):
 @async_task.task
 def tailf_tail(id, channel_name):
     """
-    重写使用paramiko与系统交互，通过tail命令监控文件
+    重写使用paraAmiko与系统交互，通过tail命令监控文件
     手动清理用户：
             w
             pkill -kill -t pts/6

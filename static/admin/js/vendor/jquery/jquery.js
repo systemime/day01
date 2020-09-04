@@ -3997,7 +3997,7 @@ jQuery.extend( {
 			resolveContexts = Array( i ),
 			resolveValues = slice.call( arguments ),
 
-			// the master Deferred
+			// the mysql-master Deferred
 			master = jQuery.Deferred(),
 
 			// subordinate callback factory

@@ -1,0 +1,86 @@
+version: "3"
+
+services:
+  mysql-master:
+    image: mysql:5.7
+    container_name: mysql-master
+    restart: always
+    ports:
+      - "33066:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=Admin@2488.m
+      - TZ=Asia/Shanghai
+    volumes:
+      - "./mysql-master/data:/var/lib/mysql"
+      - "./mysql-master/conf/my.cnf:/etc/mysql/my.cnf"
+    command: [
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_general_ci",
+      "--default-time-zone=+8:00"
+    ]
+    hostname: mysql-master
+    links:
+      - mysql-slave1
+      - mysql-slave2
+    networks:
+      geekae-net:
+        ipv4_address: 172.21.0.16
+
+  mysql-slave1:
+    image: mysql:5.7
+    container_name: mysql-slave1
+    restart: always
+    ports:
+      - "33067:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=Admin@2488.m1
+      - TZ=Asia/Shanghai
+    volumes:
+      - "./mysql-slave1/data:/var/lib/mysql"
+      - "./mysql-slave1/conf/my.cnf:/etc/mysql/my.cnf"
+    command: [
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_general_ci",
+      "--default-time-zone=+8:00"
+    ]
+    hostname: mysql-slave1
+    networks:
+      geekae-net:
+        ipv4_address: 172.21.0.17
+
+  mysql-slave2:
+    image: mysql:5.7
+    container_name: mysql-slave2
+    restart: always
+    ports:
+      - "33068:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=Admin@2488.m2
+      - TZ=Asia/Shanghai
+    volumes:
+      - "./mysql-slave2/data:/var/lib/mysql"
+      - "./mysql-slave2/conf/my.cnf:/etc/mysql/my.cnf"
+    command: [
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_general_ci",
+      "--default-time-zone=+8:00"
+    ]
+    hostname: mysql-slave2
+    networks:
+      geekae-net:
+        ipv4_address: 172.21.0.18
+
+#networks:
+#  geekae-net:
+#    external: true
+
+
+networks:
+  geekae-net:  # 网卡名称
+    driver: bridge  # 桥接
+    ipam:
+      config:
+      - subnet: 172.21.0.0/16  # 子网掩码
+      # - gateway: 172.21.0.1  # 网关
+
+# docker network create --driver bridge --subnet 172.21.0.0/16 --gateway 172.21.0.1 geekae-net

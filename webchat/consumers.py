@@ -64,7 +64,8 @@ class TailfConsumer(WebsocketConsumer):
 
         # 这里其实并不适合使用celery监控，实时查看监控可能处在一个较长的时间
         # celery task任务在--time-limit设置的超时时间后，硬性结束标记任务超时
-        # 目前修改超时为2小时
+        # 超时后websocket链接未断但是celery无法再反馈监控结果，目前修改超时为2小时
+        # 配置文件见conf
         self.result = tailf_tail.delay(self.file_id, self.channel_name)
 
         print('connect:', self.channel_name, self.result.id)
