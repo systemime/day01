@@ -1,0 +1,9 @@
+version: '3'
+services:
+    redis:
+        image: redis
+        container_name: redis01
+        command: redis-server --requirepass Admin@2488.r
+        restart: always
+        ports:
+            - "6379:6379"
