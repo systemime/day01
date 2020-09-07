@@ -30,7 +30,7 @@ repos:
     -   id: pylint
         exclude: ^day01/settings/, ^conf/(docker|redis-docker)/
         files:
-            settings.py, base.py
+            settings.py
 -   repo: https://github.com/pycqa/isort
     rev: 5.3.0
     hooks:
