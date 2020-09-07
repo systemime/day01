@@ -1,3 +1,5 @@
-from django.test import TestCase
+print("asdfa")
+a = [i for i in range(20)]
 
-# Create your tests here.
+
+print(a)
