@@ -10,8 +10,7 @@ repos:
       - id: flake8
         args:
             - --max-line-length=120
-            - --ignore=F622
-        exclude: ^conf/(docker|redis-docker)/
+        exclude: ^conf/(docker|redis-docker)/,^day01/settings/
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.7.2
     hooks:
@@ -29,10 +28,9 @@ repos:
     rev: v2.6.0
     hooks:
     -   id: pylint
-        exclude: ^day01/settings/
+        exclude: ^day01/settings/, ^conf/(docker|redis-docker)/
         files:
-            settings.py
-            base.py
+            settings.py, base.py
 -   repo: https://github.com/pycqa/isort
     rev: 5.3.0
     hooks:
