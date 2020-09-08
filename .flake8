@@ -1,4 +1,17 @@
 [flake8]
-ignore = E203, E302, E501, E999
+ignore = C901, W503, F405, E731, F401, F403, F841, F9
 max-complexity = 12
+max-line-length = 120
 select = B,C,E,F,W,B9
+exclude =
+    *migrations*,
+    *.pyc,
+    .git,
+    .cover,
+    __pycache__,
+    */node_modules/*,
+    */templates_module*,
+    */bin/*,
+    packages/*,
+    */settings/,
+    */conf/
