@@ -3,14 +3,16 @@ repos:
     rev: v3.2.0
     hooks:
     -   id: check-docstring-first
+    -   id: check-case-conflict
     -   id: debug-statements
+    -   id: check-json
+    -   id: fix-encoding-pragma
+    -   id: check-yaml
+    -   id: check-merge-conflict
 -   repo: https://github.com/PyCQA/flake8
     rev: 3.8.3
     hooks:
       - id: flake8
-        args:
-            - --max-line-length=120
-        exclude: ^conf/(docker|redis-docker)/,^day01/settings/
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.7.2
     hooks:
@@ -19,19 +21,29 @@ repos:
     rev: v1.5.4
     hooks:
     -   id: autopep8
--   repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v7.8.1
-    hooks:
-    -   id: eslint
-        files: \.[jt]sx?$
--   repo: https://github.com/pre-commit/mirrors-pylint
-    rev: v2.6.0
+-   repo: https://github.com/PyCQA/pylint
+    rev: pylint-2.6.0
     hooks:
     -   id: pylint
-        exclude: ^day01/settings/, ^conf/(docker|redis-docker)/
-        files:
-            settings.py
+        args: ['--disable=import-outside-toplevel']
+        exclude: ^migrations/, ^settings/, ^conf/
 -   repo: https://github.com/pycqa/isort
     rev: 5.3.0
     hooks:
       - id: isort
+-   repo: https://github.com/PyCQA/bandit
+    rev: 1.6.2
+    hooks:
+    - id: bandit
+-   repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v7.8.1
+    hooks:
+    -   id: eslint
+        files: \.js$
+        exclude: ^node_modules/
+        additional_dependencies:
+            - eslint@7.8.1
+            - eslint-config-google@0.14.0
+            - eslint-loader@4.0.2
+            - eslint-plugin-react@7.20.0
+            - babel-eslint@10.1.0
