@@ -15,10 +15,13 @@ class Author(models.Model):
 
 
 class Article(models.Model):
+
     title = models.CharField(max_length=50)
+
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     content = models.TextField()
     score = models.IntegerField()  # 文章的打分
+
     tags = models.ManyToManyField('Tag')
 
     def __str__(self):

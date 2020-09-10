@@ -19,19 +19,19 @@
 # 正则表达式匹配正确的模块名称.
 module-rgx=([a-z][a-z0-9_]*)$
 
-# 正则表达式匹配正确的属性名称.
+# 正则表达式匹配正确的属性名称
 attr-rgx=[a-z_][a-z0-9_]{,30}
 
-# 正则表达式匹配正确的类名.
+# 正则表达式匹配正确的类名
 class-rgx=[A-Z_]+[a-zA-Z0-9]+$
 
 # 正则表达式匹配正确的函数名称.
 function-rgx=[a-z_]+[a-z0-9_][a-z0-9]*$
 
-# 正则表达式匹配正确的方法名称.
+# 正则表达式匹配正确的方法名称。
 method-rgx=(([a-z_]|__)[a-z0-9_]*(__)?|test[a-zA-Z0-9_]*)$
 
-# 正则表达式匹配正确的参数名称.
+# 正则表达式匹配正确的参数名称
 argument-rgx=[a-z][a-z0-9]*_*[a-z0-9]*_*[a-z0-9]*_?$
 
 # 正则表达式匹配正确的变量名.
@@ -46,7 +46,7 @@ const-rgx=([a-z_]+[a-z0-9]*_*[a-z0-9]*_*[a-z0-9]*_?|__[a-zA-Z0-9_]*__)$||[A-Z]+
 indent-string='    '
 
 # 一行中的最大字符数.
-max-line-length=120
+max-line-length=100
 
 # 模块中的最大行数.
 max-module-lines=1000
@@ -76,7 +76,7 @@ max-locals = 35
 # W0613 - Unused argument
 # E1101 - Has no member (countless false-positives)
 # R0904 - Too many public methods
-disable-msg=R0903,W0142,W0105,W0212,W0613,E1101,R0904
+disable=R0903,W0142,W0105,W0212,W0613,E1101,R0904,W0201,W0301,W0401,E0401,C0114,C0115
 
 [REPORTS]
 
@@ -106,10 +106,10 @@ notes=FIXME,TODO,XXX,YYY
 
 [MASTER]
 # 忽略文件(夹)，逗号隔开
-ignore=test
+ignore=tests,migrations,settings,__pycache__
 
 # 正则忽略文件或目录
-ignore-patterns=*/settings/*
+#ignore-patterns=
 
 # 关闭警告
 disable-msg=R0904,R0903,E1101,R21
