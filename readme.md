@@ -6,6 +6,19 @@ django 3.1
 pip freeze > requestion.txt
 pip install -r requestion.txt
 
+## 代码提交
+
+```shell script
+npm install -g eslint
+pip install pre-commit
+pre-commit install
+git add .
+git commit -m ""
+
+......
+
+```
+
 ## 项目启动
 ### 启动web服务
 > gunicorn day01.asgi:application -b 0.0.0.0:60013 --reload -w 2 -t 1 -k uvicorn.workers.UvicornWorker

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django settings for day01 project.
 
@@ -9,16 +10,16 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-# django3.1以后推荐使用链式查找
+
 import os
+# django3.1以后推荐使用链式查找
 from pathlib import Path
 from urllib.parse import quote
 
 from kombu import Queue
 
-from webchat.settings import *  # noqa
-
 # 导入webchat的setting 请勿删除
+from webchat.settings import *  # noqa
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -29,110 +30,134 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "98^43)_-#&ygg#_#b2g%wp!$8$nlb^eyki8l*ho(7&rtuw4a&1"
+SECRET_KEY = '98^43)_-#&ygg#_#b2g%wp!$8$nlb^eyki8l*ho(7&rtuw4a&1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",  # 同时也是cacahe_db模式必要组件
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "gunicorn",
-    "celery",
-    "channels",
-    "channels_redis",
-    "rest_framework",
-    "app01.apps.App01Config",
-    "app02.apps.App02Config",
-    "app03.apps.App03Config",
-    "app04.apps.App04Config",
-    "webchat",
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',  # 同时也是cacahe_db模式必要组件
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'gunicorn',
+    'celery',
+    'channels',
+    'channels_redis',
+    'rest_framework',
+    'app01.apps.App01Config',
+    'app02.apps.App02Config',
+    'app03.apps.App03Config',
+    'app04.apps.App04Config',
+    'webchat'
 ]
 
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",  # session支持中间件
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",  # 消息中间件，对cookie等用户会话支持
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',  # session支持中间件
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',  # 消息中间件，对cookie等用户会话支持
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 压缩 https://docs.djangoproject.com/en/3.1/ref/middleware/#module-django.middleware.gzip
-    "django.middleware.gzip.GZipMiddleware",
+    'django.middleware.gzip.GZipMiddleware',
     # 添加浏览器支持 https://docs.djangoproject.com/en/3.1/topics/performance/#conditionalgetmiddleware
-    "django.middleware.http.ConditionalGetMiddleware",
-    "app03.app03_middleware.App03Middle",  # 自定义中间件
+    'django.middleware.http.ConditionalGetMiddleware',
+    'app03.app03_middleware.App03Middle',  # 自定义中间件
 ]
 
-ROOT_URLCONF = "day01.urls"
+ROOT_URLCONF = 'day01.urls'
 
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
             ],
         },
-    },
-    {
-        "BACKEND": "django.template.backends.jinja2.Jinja2",
-        "DIRS": [BASE_DIR / "templates", ],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "environment": "day01.base_jinja.environment",
-            "context_processors": [],
+    }, {
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',
+        'DIRS': [BASE_DIR / 'templates', ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'environment': 'day01.base_jinja.environment',
+            'context_processors': [],
         },
     },
 ]
 
-WSGI_APPLICATION = "day01.wsgi.application"
+WSGI_APPLICATION = 'day01.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "NAME": "day01",
-        "ENGINE": "django.db.backends.mysql",
+    'default': {},
+    'master_db': {
+        'NAME': 'day01',
+        'ENGINE': 'django.db.backends.mysql',
         "HOST": "127.0.0.1",
-        "USER": "root",
+        'USER': "root",
         "PASSWORD": "Admin@2488.m",
-        "PORT": 33066,
+        "PORT": 33066
+    },
+    'slave1_db': {
+        'NAME': 'day01',
+        'ENGINE': 'django.db.backends.mysql',
+        "HOST": "127.0.0.1",
+        'USER': "root",
+        "PASSWORD": "Admin@2488.m1",
+        "PORT": 33067
+    },
+    'slave2_db': {
+        'NAME': 'day01',
+        'ENGINE': 'django.db.backends.mysql',
+        "HOST": "127.0.0.1",
+        'USER': "root",
+        "PASSWORD": "Admin@2488.m2",
+        "PORT": 33068
     }
 }
+
+DATABASE_ROUTERS = ['day01.settings.db_router.Router']
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", },
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator", },
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator", },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = "zh-Hans"
+LANGUAGE_CODE = 'zh-Hans'
 
-TIME_ZONE = "Asia/Shanghai"
+TIME_ZONE = 'Asia/Shanghai'
 
 # If you set this to True, Django will format dates, numbers and calendars
 # according to user current locale.
@@ -148,7 +173,7 @@ APPEND_SLASH = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "static"
 # STATICFILES_DIRS = [BASE_DIR / "static", ]
 
@@ -162,7 +187,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000
 
 # -- 用户继承模型
-AUTH_USER_MODEL = "app01.UserProfile"
+AUTH_USER_MODEL = 'app01.UserProfile'
 
 # -- 异步安全选项
 # Django的某些关键部分在异步环境中无法安全运行，因为它们的全局状态不支持协同程序。
@@ -184,14 +209,14 @@ AUTH_USER_MODEL = "app01.UserProfile"
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 # -- Channels
-ASGI_APPLICATION = "day01.routing.application"
+ASGI_APPLICATION = 'day01.routing.application'
 
-REDIS_PASSWORD = quote("Admin@2488.r")
+REDIS_PASSWORD = quote('Admin@2488.r')
 
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
             # "hosts": [('127.0.0.1', 6379)],
             "hosts": ["redis://:{}@127.0.0.1:6379/2".format("Admin@2488.r")],
             "symmetric_encryption_keys": [SECRET_KEY],
@@ -202,33 +227,30 @@ CHANNEL_LAYERS = {
 # -- 缓存配置
 # MemcachedCache 缓存替换原则是LRU算法（速度快，安全性低，数据格式必须简单，弃用换redis）
 CACHES = {
-    "default": {
+    'default': {
         # 指定缓存使用的引擎
-        "BACKEND": "django_redis.cache.RedisCache",
+        'BACKEND': 'django_redis.cache.RedisCache',
         # 与celery结果存放于同一数据库，尝试获取执行结果
-        "LOCATION": "redis://127.0.0.1:6379/1",  # 分片行为，可以直接使用默认的0库
+        'LOCATION': 'redis://127.0.0.1:6379/1',  # 分片行为，可以直接使用默认的0库
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",  # 激活数据压缩
-            # 特定缓存键值对，每个项目均不同，防止不同项目之间的缓存实例混用，不设置本项(不要为空)django自动设置
-            "KEY_PREFIX": "day01_test",
+            "KEY_PREFIX": "day01_test",  # 特定缓存键值对，每个项目均不同，防止不同项目之间的缓存实例混用，不设置本项(不要为空)django自动设置
             "IGNORE_EXCEPTIONS": True,  # 防止redis意外关闭造成异常，memcached backend 的默认行为 django-redis配置项
             "PASSWORD": "Admin@2488.r",
-        },
+        }
     }
 }
 
 # -- celery配置
 # Celery application definition 异步任务设置
-BROKER_URL = "amqp://guest:guest@localhost:5672//"  # RabbitMQ 默认连接
-CELERY_RESULT_BACKEND = "redis://:{}@localhost:6379/2".format(
-    "Admin@2488.r"
-)  # 结果存放，可用于跟踪结果
+BROKER_URL = 'amqp://guest:guest@localhost:5672//'  # RabbitMQ 默认连接
+CELERY_RESULT_BACKEND = 'redis://:{}@localhost:6379/2'.format("Admin@2488.r")  # 结果存放，可用于跟踪结果
 # 存放在django-orm 数据表中
 # CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 # celery内容等消息的格式设置
-CELERY_ACCEPT_CONTENT = ["pickle", "json", "msgpack", "yaml"]
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 # CELERY_RESULT_SERIALIZER = 'json'  # 结果的序列化方式
 # CELERY_TASK_SERIALIZER = 'json'  # 消息任务的序列化方式
 # 时区
@@ -236,9 +258,7 @@ CELERY_ENABLE_UTC = False
 CELERY_TIMEZONE = TIME_ZONE
 
 # 性能配置
-CELERYD_CONCURRENCY = (
-    2  # celery worker的并发数 命令行 -c 指定的数目,worker不是越多越好,保证任务不堆积,加上一定新增任务的预留就可以
-)
+CELERYD_CONCURRENCY = 2  # celery worker的并发数 命令行 -c 指定的数目,worker不是越多越好,保证任务不堆积,加上一定新增任务的预留就可以
 CELERYD_PREFETCH_MULTIPLIER = 4  # celery worker 每次去 rabbitMQ 取任务的数量, 日后需要区分低频与高频任务分开设置
 CELERYD_MAX_TASKS_PER_CHILD = 100  # 每个worker执行了多少任务就会死掉（重制），默认无限, 业务增长容易爆内存
 # CELERY_DEFAULT_QUEUE = "message_queue"  # 默认的队列，如果一个消息不符合其他的队列就会放在默认队列里面,发现如果设置无法选择其他路由
@@ -251,21 +271,20 @@ CELERY_QUEUES = (
     #     "exchange_type": "direct",  # 交换机类型
     #     "routing_key": "default"  # 路由关键字，交换机按key进行消息投递
     # },
-    Queue(
-        name="select_queue", exchange="select_queue", routing_key="select_router"
-    ),  # 队列 - 查询服务
-    Queue(
-        name="tailf_queue", exchange="tailf_queue", routing_key="tailf_queue"
-    ),  # 队列 - 监听日志
+    Queue(name='select_queue', exchange='select_queue', routing_key='select_router'),  # 队列 - 查询服务
+    Queue(name='tailf_queue', exchange='tailf_queue', routing_key='tailf_queue'),  # 队列 - 监听日志
 )
 # Queue的路由
 CELERY_ROUTES = {
-    "app01.tasks.select": {
-        "queue": "select_queue",
-        "routing_key": "select_router",
+    'app01.tasks.select': {
+        'queue': 'select_queue',
+        'routing_key': 'select_router',
         # 'priority': 10  # 优先级指定 仅在redis或rabbitmq时
     },
-    "webchat.tasks.tailf": {"queue": "tailf_queue", "routing_key": "tailf_queue"},
+    'webchat.tasks.tailf': {
+        'queue': 'tailf_queue',
+        'routing_key': 'tailf_queue'
+    },
 }
 
 # # 日志配置
@@ -288,14 +307,12 @@ CELERY_ROUTES = {
 # -- session缓存配置
 # 重建数据库后一定要运行cache.clear()清除缓存中残留的session，否则无法登录
 # cached_db缓存模式，session先存储到缓存中，再存储到数据库（同读取顺序）
-SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 # # SESSION_ENGINE = "django.contrib.sessions.backends.cache"  # 官方
 SESSION_CACHE_ALIAS = "default"  # 缓存
 # # session 过期时间，
 SESSION_COOKIE_AGE = 60 * 60 * 4  # 4小时
-SESSION_SAVE_EVERY_REQUEST = (
-    True  # 是否每次请求都保存session，默认修改后才保存 即，false到期实际马上失效，true每次请求重新计时
-)
+SESSION_SAVE_EVERY_REQUEST = True  # 是否每次请求都保存session，默认修改后才保存 即，false到期实际马上失效，true每次请求重新计时
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 关闭浏览器，则COOKIE失效
 SESSION_COOKIE_NAME = "geek_ae"  # 浏览器中session字符串key标识
 # SESSION_COOKIE_SECURE = True  # 进行设置True以避免在HTTP上意外传输会话cookie
