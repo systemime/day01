@@ -106,10 +106,12 @@ notes=FIXME,TODO,XXX,YYY
 
 [MASTER]
 # 忽略文件(夹)，逗号隔开
+# https://www.thetopsites.net/article/52123522.shtml
 ignore=tests,settings,__pycache__,migrations
 
 # 正则忽略文件或目录
-# ignore-patterns=
+# ignore-patterns=**/3rdparty/**/*.py
+ignore-patterns=**/migrations/{0000..1000}_initial.py
 
 # 关闭警告
 disable-msg=R0904,R0903,E1101,R21
