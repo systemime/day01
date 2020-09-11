@@ -124,4 +124,4 @@ jobs=0
 limit-inference-results=100
 
 # 指定程序错误退出之前要超过的得分阈值。
-#fail-under=8
+fail-under=8
