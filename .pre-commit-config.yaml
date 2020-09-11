@@ -24,7 +24,7 @@ repos:
     rev: pylint-2.6.0
     hooks:
     -   id: pylint
-        exclude: ^migrations/, ^settings/, ^conf/, ^node_modules/
+        exclude: '^((?!settings/)|(?!node_modules/)|(?!migrations/))'
         files: \.py$
 -   repo: https://github.com/pycqa/isort
     rev: 5.3.0

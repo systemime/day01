@@ -3,3 +3,4 @@ conf/docker/mysql-slave1/data/
 conf/docker/mysql-slave2/data/
 __pycache__/
 node_modules
+*.log
