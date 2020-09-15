@@ -7,7 +7,12 @@ pip freeze > requestion.txt
 pip install -r requestion.txt
 
 ## 代码提交
-
+exclude: |
+            (?x)(
+                ^settings/|
+                ^node_modules/|
+                ^migrations/*
+            )
 ```shell script
 npm install -g eslint
 pip install pre-commit
