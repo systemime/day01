@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'app02.apps.App02Config',
     'app03.apps.App03Config',
     'app04.apps.App04Config',
+    'app05_models',
     'webchat'
 ]
 
@@ -107,27 +108,27 @@ WSGI_APPLICATION = 'day01.wsgi.application'
 DATABASES = {
     'default': {},
     'master_db': {
-        'NAME': 'day01',
         'ENGINE': 'django.db.backends.mysql',
-        "HOST": "127.0.0.1",
+        'NAME': 'day01',
         'USER': "root",
         "PASSWORD": "Admin@2488.m",
+        "HOST": "127.0.0.1",
         "PORT": 33066
     },
     'slave1_db': {
-        'NAME': 'day01',
         'ENGINE': 'django.db.backends.mysql',
-        "HOST": "127.0.0.1",
+        'NAME': 'day01',
         'USER': "root",
         "PASSWORD": "Admin@2488.m1",
+        "HOST": "127.0.0.1",
         "PORT": 33067
     },
     'slave2_db': {
-        'NAME': 'day01',
         'ENGINE': 'django.db.backends.mysql',
-        "HOST": "127.0.0.1",
+        'NAME': 'day01',
         'USER': "root",
         "PASSWORD": "Admin@2488.m2",
+        "HOST": "127.0.0.1",
         "PORT": 33068
     }
 }

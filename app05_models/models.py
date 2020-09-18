@@ -29,7 +29,8 @@ class Article(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, help_text="标签名称")
+    commit = models.CharField(max_length=20, verbose_name="描述", help_text="测试描述")
 
     def __str__(self):
         return self.name

@@ -25,7 +25,7 @@ MASTER_LOG_POS=154; -- binlog记录位置
 
 ## 重启slave1和slave2
 ```shell script
-docker restart mysql-slave1/mysql-slave1
+docker restart mysql-slave1 mysql-slave1
 ```
 
 ## 检查同步状态 SQL中
@@ -34,7 +34,7 @@ docker restart mysql-slave1/mysql-slave1
 start slave;
 
 # # 检查slave同步状态
-show slave status;
+show slave status\G
 # # 主要一下两个状态必须为YES
 # Slave_IO_Running: Yes
 # Slave_SQL_Running: Yes

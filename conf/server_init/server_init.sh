@@ -26,6 +26,99 @@ camouflage="/$(head -n 10 /dev/urandom | md5sum | head -c ${random_num})/"
 
 shell_version="0.0.1"
 
+judge() {
+    if [[ 0 -eq $? ]]; then
+        echo -e "${OK} ${GreenBG} $1 完成 ${Font}"
+        sleep 1
+    else
+        echo -e "${Error} ${RedBG} $1 失败${Font}"
+        exit 1
+    fi
+}
+chrony_install() {
+    yum -y install chrony
+    judge "安装 chrony 时间同步服务 "
+
+    timedatectl set-ntp true
+
+    systemctl enable chronyd && systemctl restart chronyd
+
+    judge "chronyd 启动 "
+
+    timedatectl set-timezone Asia/Shanghai
+
+    echo -e "${OK} ${GreenBG} 等待时间同步 ${Font}"
+    sleep 10
+
+    chronyc sourcestats -v
+    chronyc tracking -v
+    date
+    read -rp "请确认时间是否准确,误差范围±3分钟(Y/N): " chrony_install
+    [[ -z ${chrony_install} ]] && chrony_install="Y"
+    case $chrony_install in
+    [yY][eE][sS] | [yY])
+        echo -e "${GreenBG} 继续安装 ${Font}"
+        sleep 2
+        ;;
+    *)
+        echo -e "${RedBG} 安装终止 ${Font}"
+        exit 2
+        ;;
+    esac
+}
+
+dependency_install() {
+    yum install wget git lsof -y
+
+    yum -y install crontabs
+    judge "安装 crontab"
+
+    touch /var/spool/cron/root && chmod 600 /var/spool/cron/root
+    systemctl start crond && systemctl enable crond
+
+
+    judge "crontab 自启动配置 "
+
+    yum -y install bc
+    judge "安装 bc"
+
+    yum -y install unzip
+    judge "安装 unzip"
+
+    yum -y install qrencode
+    judge "安装 qrencode"
+
+    yum -y install curl
+    judge "安装 curl"
+
+    yum -y groupinstall "Development tools"
+    judge "编译工具包 安装"
+
+    yum -y install pcre pcre-devel zlib-devel epel-release
+
+    #    yum -y install rng-tools
+    #    judge "rng-tools 安装"
+
+    yum -y install haveged
+    #    judge "haveged 安装"
+
+    #    sed -i -r '/^HRNGDEVICE/d;/#HRNGDEVICE=\/dev\/null/a HRNGDEVICE=/dev/urandom' /etc/default/rng-tools
+
+    systemctl start haveged && systemctl enable haveged
+}
+
+init_install() {
+    # 常见软件安装(npm单独编译安装)
+    yum update
+    yum install lrzsz ntpdate sysstat net-tools gcc gcc-g++ make cmake wget vim git -y
+    # 常用依赖安装
+    yum install -y gmp-devel mpfr-devel libmpc-devel glibc autoconf openssl openssl-devel pcre-devel pam-devel
+    yum -y groupinstall "Development tools"
+    yum install -y pam* zlib*
+    mkdir -p /opt/bak
+    mkdir -p /opt/software
+}
+
 check_system() {
     if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
         echo -e "${OK} ${GreenBG} 当前系统为 Centos ${VERSION_ID} ${VERSION} ${Font}"
@@ -44,15 +137,15 @@ check_system() {
         exit 1
     fi
 
-    $INS install dbus
+    yum install dbus
 
-    systemctl stop firewalld
-    systemctl disable firewalld
-    echo -e "${OK} ${GreenBG} firewalld 已关闭 ${Font}"
+    # systemctl stop firewalld
+    # systemctl disable firewalld
+    # echo -e "${OK} ${GreenBG} firewalld 已关闭 ${Font}"
 
-    systemctl stop ufw
-    systemctl disable ufw
-    echo -e "${OK} ${GreenBG} ufw 已关闭 ${Font}"
+    # systemctl stop ufw
+    # systemctl disable ufw
+    # echo -e "${OK} ${GreenBG} ufw 已关闭 ${Font}"
 }
 
 is_root() {
@@ -65,10 +158,28 @@ is_root() {
     fi
 }
 
-# 升级gcc、npm、sqlite等编译依赖
+# 升级gcc、npm、sqlite、openssl等编译依赖
 update_upgrade_compile() {
   is_root
-  check_system
+  update_gcc
+  update_npm
+  update_sqlite
+  update_openssl
+}
+
+Basic_optimization() {
+  is_root
+
+}
+
+Basic_init() {
+  is_root
+  # 初始化文件安装
+  init_install
+  # 时钟同步
+  chrony_install
+  # 安装crontab
+  dependency_install
 }
 
 menu() {
@@ -85,7 +196,7 @@ menu() {
     echo -e "${Green}5.${Font}  查看 实时 系统 日志"
     echo -e "${Green}6.${Font}  查看端口占用进程"
     echo -e "${Green}7.${Font}  开放防火墙规则"
-    echo -e "${Green}8.${Font}  升级安装gcc、sqlite、npm版本"
+    echo -e "${Green}8.${Font}  升级安装gcc、sqlite、npm、openssl版本"
     echo -e "—————————————— 网盘服务 ——————————————"
     echo -e "${Green}70.${Font}  安装网盘服务"
     echo -e "—————————————— 其他选项 ——————————————"
@@ -150,50 +261,3 @@ menu() {
 
 #list "$1"
 menu
-
-Centos 7默认gcc版本为4.8，有时需要更高版本的，这里以升级至8.3.1版本为例，分别执行下面三条命令即可，无需手动下载源码编译
-
-1、安装centos-release-scl
-
-sudo yum install centos-release-scl
-2、安装devtoolset，注意，如果想安装7.*版本的，就改成devtoolset-7-gcc*，以此类推
-
-sudo yum install devtoolset-8-gcc*
-3、激活对应的devtoolset，所以你可以一次安装多个版本的devtoolset，需要的时候用下面这条命令切换到对应的版本
-
-scl enable devtoolset-8 bash
-大功告成，查看一下gcc版本
-
-gcc -v
-显示为 gcc version 8.3.1 20190311 (Red Hat 8.3.1-3) (GCC)
-
-补充：这条激活命令只对本次会话有效，重启会话后还是会变回原来的4.8.5版本，要想随意切换可按如下操作。
-
-首先，安装的devtoolset是在 /opt/sh 目录下的，如图
-
-
-
- 每个版本的目录下面都有个 enable 文件，如果需要启用某个版本，只需要执行
-
-source ./enable
-所以要想切换到某个版本，只需要执行
-
-source /opt/rh/devtoolset-8/enable
-可以将对应版本的切换命令写个shell文件放在配了环境变量的目录下，需要时随时切换，或者开机自启
-
-4、直接替换旧的gcc
-
-旧的gcc是运行的 /usr/bin/gcc，所以将该目录下的gcc/g++替换为刚安装的新版本gcc软连接，免得每次enable
-
-复制代码
-mv /usr/bin/gcc /usr/bin/gcc-4.8.5
-
-ln -s /opt/rh/devtoolset-8/root/bin/gcc /usr/bin/gcc
-
-mv /usr/bin/g++ /usr/bin/g++-4.8.5
-
-ln -s /opt/rh/devtoolset-8/root/bin/g++ /usr/bin/g++
-
-gcc --version
-
-g++ --version
